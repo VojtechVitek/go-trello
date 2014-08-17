@@ -78,6 +78,33 @@ func (c *Client) Member(nick string) (member *Member, err error) {
 	return
 }
 
+func (m *Member) Boards() (boards []Board, err error) {
+	req, err := http.NewRequest("GET", m.client.endpoint+"/member/"+m.Id+"/boards", nil)
+	if err != nil {
+		return
+	}
+
+	resp, err := m.client.client.Do(req)
+	if err != nil {
+		return
+	}
+	defer resp.Body.Close()
+
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return
+	} else if resp.StatusCode != 200 {
+		err = fmt.Errorf("Received unexpected status %d while trying to retrieve the server data", resp.StatusCode)
+		return
+	}
+
+	err = json.Unmarshal(body, &boards)
+	for i, _ := range boards {
+		boards[i].client = m.client
+	}
+	return
+}
+
 // TODO: Avatar sizes [170, 30]
 func (m *Member) AvatarUrl() string {
 	return "https://trello-avatars.s3.amazonaws.com/" + m.AvatarHash + "/170.png"
