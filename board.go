@@ -110,6 +110,9 @@ func (b *Board) Lists() (lists []List, err error) {
 	}
 
 	err = json.Unmarshal(body, &lists)
+	for i, _ := range lists {
+		lists[i].client = b.client
+	}
 	return
 }
 
