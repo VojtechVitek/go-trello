@@ -16,6 +16,13 @@ limitations under the License.
 
 package trello
 
+import (
+	"encoding/json"
+	"fmt"
+	"io/ioutil"
+	"net/http"
+)
+
 type Card struct {
 	client                *Client
 	Id                    string   `json:"id"`
@@ -53,4 +60,56 @@ type Card struct {
 	ShortUrl     string   `json:"shortUrl"`
 	Subscribed   bool     `json:"subscribed"`
 	Url          string   `json:"url"`
+}
+
+func (c *Client) Card(CardId string) (card *Card, err error) {
+	req, err := http.NewRequest("GET", c.endpoint+"/card/"+CardId, nil)
+	if err != nil {
+		return
+	}
+
+	resp, err := c.client.Do(req)
+	if err != nil {
+		return
+	}
+	defer resp.Body.Close()
+
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return
+	} else if resp.StatusCode != 200 {
+		err = fmt.Errorf("Received unexpected status %d while trying to retrieve the server data", resp.StatusCode)
+		return
+	}
+
+	err = json.Unmarshal(body, &card)
+	card.client = c
+	return
+}
+
+func (c *Card) Checklists() (checklists []Checklist, err error) {
+	req, err := http.NewRequest("GET", c.client.endpoint+"/card/"+c.Id+"/checklists", nil)
+	if err != nil {
+		return
+	}
+
+	resp, err := c.client.client.Do(req)
+	if err != nil {
+		return
+	}
+	defer resp.Body.Close()
+
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return
+	} else if resp.StatusCode != 200 {
+		err = fmt.Errorf("Received unexpected status %d while trying to retrieve the server data", resp.StatusCode)
+		return
+	}
+
+	err = json.Unmarshal(body, &checklists)
+	for i, _ := range checklists {
+		checklists[i].client = c.client
+	}
+	return
 }
