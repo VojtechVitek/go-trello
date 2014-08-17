@@ -24,7 +24,67 @@ import (
 )
 
 type Board struct {
-	Id string `json:"id"`
+	Id             string   `json:"id"`
+	Name           string   `json:"name"`
+	Desc           string   `json:"desc"`
+	DescData       string   `json:"descData"`
+	Closed         bool     `json:"closed"`
+	IdOrganization string   `json:"idOrganization"`
+	Pinned         []string `json:"pinned"`
+	Url            string   `json:"url"`
+	ShortUrl       string   `json:"shortUrl`
+	Prefs          struct {
+		PermissionLevel       string `json:"permissionLevel"`
+		Voting                string `json:"voting"`
+		Comments              string `json:"comments"`
+		Invitations           string `json:"invitations"`
+		SelfJoin              bool   `json:"selfjoin"`
+		CardCovers            bool   `json:"cardCovers"`
+		CardAging             string `json:"cardAging"`
+		CalendarFeedEnabled   bool   `json:"calendarFeedEnabled"`
+		Background            string `json:"background"`
+		BackgroundColor       string `json:"backgroundColor"`
+		BackgroundImage       string `json:"backgroundImage"`
+		BackgroundImageScaled string `json:"backgroundImageScaled"`
+		BackgroundTile        bool   `json:"backgroundTile"`
+		BackgroundBrightness  string `json:"backgroundBrightness"`
+		CanBePublic           bool   `json:"canBePublic"`
+		CanBeOrg              bool   `json:"canBeOrg"`
+		CanBePrivate          bool   `json:"canBePrivate"`
+		CanInvite             bool   `json:"canInvite"`
+	} `json:"prefs"`
+	LabelNames struct {
+		Red    string `json:"red"`
+		Orange string `json:"orange"`
+		Yellow string `json:"yellow"`
+		Green  string `json:"green"`
+		Blue   string `json:"blue"`
+		Purple string `json:"purple"`
+	} `json:"labelNames"`
+}
+
+func (c *Client) Board(boardId string) (board *Board, err error) {
+	req, err := http.NewRequest("GET", c.endpoint+"/boards/"+boardId, nil)
+	if err != nil {
+		return
+	}
+
+	resp, err := c.client.Do(req)
+	if err != nil {
+		return
+	}
+	defer resp.Body.Close()
+
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return
+	} else if resp.StatusCode != 200 {
+		err = fmt.Errorf("Received unexpected status %d while trying to retrieve the server data", resp.StatusCode)
+		return
+	}
+
+	err = json.Unmarshal(body, &board)
+	return
 }
 
 func (c *Client) BoardMembers(boardId string) (members []Member, err error) {
