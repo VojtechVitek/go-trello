@@ -39,7 +39,7 @@ type Card struct {
 	IdAttachmentCover     string   `json:"idAttachmentCover"`
 	ManualCoverAttachment bool     `json:"manualCoverAttachment"`
 	Name                  string   `json:"name"`
-	Pos                   int      `json:"pos"`
+	Pos                   float32  `json:"pos"`
 	ShortLink             string   `json:"shortLink"`
 	Badges                struct {
 		Votes              int    `json:"votes"`

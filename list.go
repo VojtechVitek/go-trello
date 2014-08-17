@@ -25,11 +25,11 @@ import (
 
 type List struct {
 	client  *Client
-	Id      string `json:"id"`
-	Name    string `json:"name"`
-	Closed  bool   `json:"closed"`
-	IdBoard string `json:"idBoard"`
-	Pos     int    `json:"pos"`
+	Id      string  `json:"id"`
+	Name    string  `json:"name"`
+	Closed  bool    `json:"closed"`
+	IdBoard string  `json:"idBoard"`
+	Pos     float32 `json:"pos"`
 }
 
 func (l *List) Cards() (cards []Card, err error) {

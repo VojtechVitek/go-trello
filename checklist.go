@@ -18,11 +18,11 @@ package trello
 
 type Checklist struct {
 	client     *Client
-	Id         string `json:"id"`
-	Name       string `json:"name"`
-	IdBoard    string `json:"idBoard"`
-	IdCard     string `json:"idCard"`
-	Pos        int    `json:"pos"`
+	Id         string  `json:"id"`
+	Name       string  `json:"name"`
+	IdBoard    string  `json:"idBoard"`
+	IdCard     string  `json:"idCard"`
+	Pos        float32 `json:"pos"`
 	CheckItems []struct {
 		State    string `json:"state"`
 		Id       string `json:"id"`
@@ -30,6 +30,6 @@ type Checklist struct {
 		NameData struct {
 			Emoji struct{} `json:"emoji"`
 		} `json:"nameData"`
-		Pos int `json:"pos"`
+		Pos float32 `json:"pos"`
 	} `json:"checkItems"`
 }
