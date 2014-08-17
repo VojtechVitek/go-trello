@@ -24,6 +24,7 @@ import (
 )
 
 type Member struct {
+	client                   *Client
 	Id                       string   `json:"id"`
 	AvatarHash               string   `json:"avatarHash"`
 	Bio                      string   `json:"bio"`
@@ -73,6 +74,7 @@ func (c *Client) Member(nick string) (member *Member, err error) {
 	}
 
 	err = json.Unmarshal(body, &member)
+	member.client = c
 	return
 }
 

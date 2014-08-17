@@ -24,6 +24,7 @@ import (
 )
 
 type Board struct {
+	client         *Client
 	Id             string   `json:"id"`
 	Name           string   `json:"name"`
 	Desc           string   `json:"desc"`
@@ -84,16 +85,41 @@ func (c *Client) Board(boardId string) (board *Board, err error) {
 	}
 
 	err = json.Unmarshal(body, &board)
+	board.client = c
 	return
 }
 
-func (c *Client) BoardMembers(boardId string) (members []Member, err error) {
-	req, err := http.NewRequest("GET", c.endpoint+"/boards/"+boardId+"/members", nil)
+func (b *Board) Lists() (lists []List, err error) {
+	req, err := http.NewRequest("GET", b.client.endpoint+"/boards/"+b.Id+"/lists", nil)
 	if err != nil {
 		return
 	}
 
-	resp, err := c.client.Do(req)
+	resp, err := b.client.client.Do(req)
+	if err != nil {
+		return
+	}
+	defer resp.Body.Close()
+
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return
+	} else if resp.StatusCode != 200 {
+		err = fmt.Errorf("Received unexpected status %d while trying to retrieve the server data", resp.StatusCode)
+		return
+	}
+
+	err = json.Unmarshal(body, &lists)
+	return
+}
+
+func (b *Board) Members() (members []Member, err error) {
+	req, err := http.NewRequest("GET", b.client.endpoint+"/boards/"+b.Id+"/members", nil)
+	if err != nil {
+		return
+	}
+
+	resp, err := b.client.client.Do(req)
 	if err != nil {
 		return
 	}
