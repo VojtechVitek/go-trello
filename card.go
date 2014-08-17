@@ -26,22 +26,33 @@ import (
 type Card struct {
 	client                *Client
 	Id                    string   `json:"id"`
-	CheckItemStates       string   `json:"checkItemStates"`
-	Closed                bool     `json:"closed"`
-	DateLastActivity      string   `json:"dateLastActivity"`
-	Desc                  string   `json:"desc"`
-	DescData              []string `json:"descData"`
+	Name                  string   `json:"name"`
 	Email                 string   `json:"email"`
-	IdBoard               string   `json:"idBoard"`
-	IdList                string   `json:"idList"`
-	IdMembersVoted        []string `json:"idMembersVoted"`
 	IdShort               int      `json:"idShort"`
 	IdAttachmentCover     string   `json:"idAttachmentCover"`
+	IdCheckLists          []string `json:"idCheckLists"`
+	IdBoard               string   `json:"idBoard"`
+	IdList                string   `json:"idList"`
+	IdMembers             []string `json:"idMembers"`
+	IdMembersVoted        []string `json:"idMembersVoted"`
 	ManualCoverAttachment bool     `json:"manualCoverAttachment"`
-	Name                  string   `json:"name"`
+	Closed                bool     `json:"closed"`
 	Pos                   float32  `json:"pos"`
 	ShortLink             string   `json:"shortLink"`
-	Badges                struct {
+	DateLastActivity      string   `json:"dateLastActivity"`
+	ShortUrl              string   `json:"shortUrl"`
+	Subscribed            bool     `json:"subscribed"`
+	Url                   string   `json:"url"`
+	Due                   string   `json:"due"`
+	Desc                  string   `json:"desc"`
+	DescData              struct {
+		Emoji struct{} `json:"emoji"`
+	} `json:"descData"`
+	CheckItemStates []struct {
+		IdCheckItem string `json:"idCheckItem"`
+		State       string `json:"state"`
+	} `json:"checkItemStates"`
+	Badges struct {
 		Votes              int    `json:"votes"`
 		ViewingMemberVoted bool   `json:"viewingMemberVoted"`
 		Subscribed         bool   `json:"subscribed"`
@@ -50,16 +61,13 @@ type Card struct {
 		CheckItemsChecked  int    `json:"checkItemsChecked"`
 		Comments           int    `json:"comments"`
 		Attachments        int    `json:"attachments"`
-		Description        string `json:"description"`
+		Description        bool   `json:"description"`
 		Due                string `json:"due"`
 	} `json:"badges"`
-	Due          string   `json:"due"`
-	IdCheckLists []string `json:"idCheckLists"`
-	IdMembers    []string `json:"idMembers"`
-	Labels       []string `json:"labels"`
-	ShortUrl     string   `json:"shortUrl"`
-	Subscribed   bool     `json:"subscribed"`
-	Url          string   `json:"url"`
+	Labels []struct {
+		Color string `json:"color"`
+		Name  string `json:"name"`
+	} `json:"labels"`
 }
 
 func (c *Client) Card(CardId string) (card *Card, err error) {
