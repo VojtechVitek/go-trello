@@ -21,5 +21,5 @@ type List struct {
 	Name    string `json:"name"`
 	Closed  bool   `json:"closed"`
 	IdBoard string `json:"idBoard"`
-	Pos     int    `json:"int"`
+	Pos     int    `json:"pos"`
 }
