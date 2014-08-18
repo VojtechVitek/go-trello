@@ -2,6 +2,9 @@ Go Trello client
 ----------------
 This [Go](http://golang.org/) package implements the [Trello](http://www.trello.com/) [API](http://trello.com/api).
 
+[![GoDoc](https://godoc.org/github.com/VojtechVitek/go-trello?status.png)](https://godoc.org/github.com/VojtechVitek/go-trello)
+[![Travis](https://travis-ci.org/VojtechVitek/go-trello.svg?branch=master)](https://travis-ci.org/VojtechVitek/go-trello)
+
 Example
 -------
 
