@@ -139,3 +139,30 @@ func (b *Board) Members() (members []Member, err error) {
 	err = json.Unmarshal(body, &members)
 	return
 }
+
+func (b *Board) Cards() (cards []Card, err error) {
+	req, err := http.NewRequest("GET", b.client.endpoint+"/boards/"+b.Id+"/cards", nil)
+	if err != nil {
+		return
+	}
+
+	resp, err := b.client.client.Do(req)
+	if err != nil {
+		return
+	}
+	defer resp.Body.Close()
+
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return
+	} else if resp.StatusCode != 200 {
+		err = fmt.Errorf("Received unexpected status %d while trying to retrieve the server data", resp.StatusCode)
+		return
+	}
+
+	err = json.Unmarshal(body, &cards)
+	for i, _ := range cards {
+		cards[i].client = b.client
+	}
+	return
+}
