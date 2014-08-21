@@ -191,3 +191,30 @@ func (b *Board) Card(IdCard string) (card *Card, err error) {
 	card.client = b.client
 	return
 }
+
+func (b *Board) Checklists() (checklists []Checklist, err error) {
+	req, err := http.NewRequest("GET", b.client.endpoint+"/boards/"+b.Id+"/checklists", nil)
+	if err != nil {
+		return
+	}
+
+	resp, err := b.client.client.Do(req)
+	if err != nil {
+		return
+	}
+	defer resp.Body.Close()
+
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return
+	} else if resp.StatusCode != 200 {
+		err = fmt.Errorf("Received unexpected status %d while trying to retrieve the server data", resp.StatusCode)
+		return
+	}
+
+	err = json.Unmarshal(body, &checklists)
+	for i, _ := range checklists {
+		checklists[i].client = b.client
+	}
+	return
+}
