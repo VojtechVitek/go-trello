@@ -148,3 +148,30 @@ func (c *Card) Members() (members []Member, err error) {
 	}
 	return
 }
+
+func (c *Card) Attachments() (attachments []Attachment, err error) {
+	req, err := http.NewRequest("GET", c.client.endpoint+"/cards/"+c.Id+"/attachments", nil)
+	if err != nil {
+		return
+	}
+
+	resp, err := c.client.client.Do(req)
+	if err != nil {
+		return
+	}
+	defer resp.Body.Close()
+
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return
+	} else if resp.StatusCode != 200 {
+		err = fmt.Errorf("Received unexpected status %d while trying to retrieve the server data", resp.StatusCode)
+		return
+	}
+
+	err = json.Unmarshal(body, &attachments)
+	for i, _ := range attachments {
+		attachments[i].client = c.client
+	}
+	return
+}
