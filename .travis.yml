@@ -5,7 +5,8 @@ go:
   - 1.2
   - tip
 
-install: true
+install:
+  - go build -race -v ./
 
 script:
-  - echo "Done"
+  - go test -race ./tests/...
