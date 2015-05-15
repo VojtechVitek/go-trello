@@ -20,7 +20,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
-	"net/http"
 )
 
 type List struct {
@@ -33,7 +32,7 @@ type List struct {
 }
 
 func (l *List) Cards() (cards []Card, err error) {
-	req, err := http.NewRequest("GET", l.client.endpoint+"/lists/"+l.Id+"/cards", nil)
+	req, err := l.client.NewRequest("GET", l.client.endpoint+"/lists/"+l.Id+"/cards", nil)
 	if err != nil {
 		return
 	}
