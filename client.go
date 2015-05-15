@@ -16,17 +16,28 @@ limitations under the License.
 
 package trello
 
-import "net/http"
+import (
+	"fmt"
+	"io"
+	"net/http"
+)
 
 type Client struct {
-	// Auth
-
 	client   *http.Client
 	endpoint string
 	version  string
+	key      string
+	token    string
 }
 
-func NewClient() (*Client, error) {
+func (c *Client) NewRequest(method, url string, body io.Reader) (*http.Request, error) {
+	if c.key != "" && c.token != "" {
+		return http.NewRequest(method, fmt.Sprintf("%s?key=%s&token=%s", url, c.key, c.token), nil)
+	}
+	return http.NewRequest(method, url, nil)
+}
+
+func NewClient(key, token string) (*Client, error) {
 	version := "1"
 	endpoint := "https://api.trello.com/" + version
 
@@ -34,5 +45,7 @@ func NewClient() (*Client, error) {
 		client:   http.DefaultClient,
 		endpoint: endpoint,
 		version:  version,
+		key:      key,
+		token:    token,
 	}, nil
 }
