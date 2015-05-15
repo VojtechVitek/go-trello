@@ -20,39 +20,40 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
-	"net/http"
 )
 
 type Board struct {
-	client         *Client
-	Id             string   `json:"id"`
-	Name           string   `json:"name"`
-	Desc           string   `json:"desc"`
-	DescData       string   `json:"descData"`
-	Closed         bool     `json:"closed"`
-	IdOrganization string   `json:"idOrganization"`
-	Pinned         []string `json:"pinned"`
-	Url            string   `json:"url"`
-	ShortUrl       string   `json:"shortUrl`
+	client   *Client
+	Id       string `json:"id"`
+	Name     string `json:"name"`
+	Desc     string `json:"desc"`
+	DescData struct {
+		Todo string `json:"todo"`
+	} `json:"descData"`
+	Closed         bool   `json:"closed"`
+	IdOrganization string `json:"idOrganization"`
+	Pinned         bool   `json:"pinned"`
+	Starred        bool   `json:"starred"`
+	Url            string `json:"url"`
+	ShortUrl       string `json:"shortUrl`
 	Prefs          struct {
-		PermissionLevel       string `json:"permissionLevel"`
-		Voting                string `json:"voting"`
-		Comments              string `json:"comments"`
-		Invitations           string `json:"invitations"`
-		SelfJoin              bool   `json:"selfjoin"`
-		CardCovers            bool   `json:"cardCovers"`
-		CardAging             string `json:"cardAging"`
-		CalendarFeedEnabled   bool   `json:"calendarFeedEnabled"`
-		Background            string `json:"background"`
-		BackgroundColor       string `json:"backgroundColor"`
-		BackgroundImage       string `json:"backgroundImage"`
-		BackgroundImageScaled string `json:"backgroundImageScaled"`
-		BackgroundTile        bool   `json:"backgroundTile"`
-		BackgroundBrightness  string `json:"backgroundBrightness"`
-		CanBePublic           bool   `json:"canBePublic"`
-		CanBeOrg              bool   `json:"canBeOrg"`
-		CanBePrivate          bool   `json:"canBePrivate"`
-		CanInvite             bool   `json:"canInvite"`
+		PermissionLevel      string `json:"permissionLevel"`
+		Voting               string `json:"voting"`
+		Comments             string `json:"comments"`
+		Invitations          string `json:"invitations"`
+		SelfJoin             bool   `json:"selfjoin"`
+		CardCovers           bool   `json:"cardCovers"`
+		CardAging            string `json:"cardAging"`
+		CalendarFeedEnabled  bool   `json:"calendarFeedEnabled"`
+		Background           string `json:"background"`
+		BackgroundColor      string `json:"backgroundColor"`
+		BackgroundImage      string `json:"backgroundImage"`
+		BackgroundTile       bool   `json:"backgroundTile"`
+		BackgroundBrightness string `json:"backgroundBrightness"`
+		CanBePublic          bool   `json:"canBePublic"`
+		CanBeOrg             bool   `json:"canBeOrg"`
+		CanBePrivate         bool   `json:"canBePrivate"`
+		CanInvite            bool   `json:"canInvite"`
 	} `json:"prefs"`
 	LabelNames struct {
 		Red    string `json:"red"`
@@ -65,7 +66,7 @@ type Board struct {
 }
 
 func (c *Client) Board(boardId string) (board *Board, err error) {
-	req, err := http.NewRequest("GET", c.endpoint+"/boards/"+boardId, nil)
+	req, err := c.NewRequest("GET", c.endpoint+"/boards/"+boardId, nil)
 	if err != nil {
 		return
 	}
@@ -90,7 +91,7 @@ func (c *Client) Board(boardId string) (board *Board, err error) {
 }
 
 func (b *Board) Lists() (lists []List, err error) {
-	req, err := http.NewRequest("GET", b.client.endpoint+"/boards/"+b.Id+"/lists", nil)
+	req, err := b.client.NewRequest("GET", b.client.endpoint+"/boards/"+b.Id+"/lists", nil)
 	if err != nil {
 		return
 	}
@@ -117,7 +118,7 @@ func (b *Board) Lists() (lists []List, err error) {
 }
 
 func (b *Board) Members() (members []Member, err error) {
-	req, err := http.NewRequest("GET", b.client.endpoint+"/boards/"+b.Id+"/members", nil)
+	req, err := b.client.NewRequest("GET", b.client.endpoint+"/boards/"+b.Id+"/members", nil)
 	if err != nil {
 		return
 	}
@@ -141,7 +142,7 @@ func (b *Board) Members() (members []Member, err error) {
 }
 
 func (b *Board) Cards() (cards []Card, err error) {
-	req, err := http.NewRequest("GET", b.client.endpoint+"/boards/"+b.Id+"/cards", nil)
+	req, err := b.client.NewRequest("GET", b.client.endpoint+"/boards/"+b.Id+"/cards", nil)
 	if err != nil {
 		return
 	}
@@ -168,7 +169,7 @@ func (b *Board) Cards() (cards []Card, err error) {
 }
 
 func (b *Board) Card(IdCard string) (card *Card, err error) {
-	req, err := http.NewRequest("GET", b.client.endpoint+"/boards/"+b.Id+"/cards/"+IdCard, nil)
+	req, err := b.client.NewRequest("GET", b.client.endpoint+"/boards/"+b.Id+"/cards/"+IdCard, nil)
 	if err != nil {
 		return
 	}
@@ -193,7 +194,7 @@ func (b *Board) Card(IdCard string) (card *Card, err error) {
 }
 
 func (b *Board) Checklists() (checklists []Checklist, err error) {
-	req, err := http.NewRequest("GET", b.client.endpoint+"/boards/"+b.Id+"/checklists", nil)
+	req, err := b.client.NewRequest("GET", b.client.endpoint+"/boards/"+b.Id+"/checklists", nil)
 	if err != nil {
 		return
 	}
@@ -220,7 +221,7 @@ func (b *Board) Checklists() (checklists []Checklist, err error) {
 }
 
 func (b *Board) MemberCards(IdMember string) (cards []Card, err error) {
-	req, err := http.NewRequest("GET", b.client.endpoint+"/boards/"+b.Id+"/members/"+IdMember+"/cards", nil)
+	req, err := b.client.NewRequest("GET", b.client.endpoint+"/boards/"+b.Id+"/members/"+IdMember+"/cards", nil)
 	if err != nil {
 		return
 	}
