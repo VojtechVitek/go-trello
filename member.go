@@ -20,7 +20,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
-	"net/http"
+	"log"
 )
 
 type Member struct {
@@ -31,7 +31,7 @@ type Member struct {
 	BioData                  string   `json:"bioData"`
 	Confirmed                bool     `json:"confirmed"`
 	FullName                 string   `json:"fullName"`
-	IdPremOrgsAdmin          string   `json:"idPremOrgsAdmin"`
+	IdPremOrgsAdmin          []string `json:"idPremOrgsAdmin"`
 	Initials                 string   `json:"initials"`
 	MemberType               string   `json:"memberType"`
 	Products                 []string `json:"products"`
@@ -46,15 +46,15 @@ type Member struct {
 	IdOrganizations          []string `json:"idOrganizations"`
 	LoginTypes               string   `json:"loginTypes"`
 	NewEmail                 string   `json:"newEmail"`
-	OneTimeMessagesDismissed string   `json:"oneTimeMessagesDismissed"`
-	Prefs                    string   `json:"prefs"`
-	Trophies                 []string `json:"trophies"`
-	UploadedAvatarHash       string   `json:"uploadedAvatarHash"`
-	PremiumFeatures          []string `json:"premiumFeatures"`
+	OneTimeMessagesDismissed []string `json:"oneTimeMessagesDismissed"`
+	//Prefs                    string   `json:"prefs"`
+	Trophies           []string `json:"trophies"`
+	UploadedAvatarHash string   `json:"uploadedAvatarHash"`
+	PremiumFeatures    []string `json:"premiumFeatures"`
 }
 
 func (c *Client) Member(nick string) (member *Member, err error) {
-	req, err := http.NewRequest("GET", c.endpoint+"/member/"+nick, nil)
+	req, err := c.NewRequest("GET", c.endpoint+"/member/"+nick, nil)
 	if err != nil {
 		return
 	}
@@ -79,7 +79,7 @@ func (c *Client) Member(nick string) (member *Member, err error) {
 }
 
 func (m *Member) Boards() (boards []Board, err error) {
-	req, err := http.NewRequest("GET", m.client.endpoint+"/member/"+m.Id+"/boards", nil)
+	req, err := m.client.NewRequest("GET", m.client.endpoint+"/member/"+m.Id+"/boards", nil)
 	if err != nil {
 		return
 	}
@@ -99,6 +99,9 @@ func (m *Member) Boards() (boards []Board, err error) {
 	}
 
 	err = json.Unmarshal(body, &boards)
+	if err != nil {
+		log.Println(err.(*json.UnmarshalTypeError).Offset)
+	}
 	for i, _ := range boards {
 		boards[i].client = m.client
 	}

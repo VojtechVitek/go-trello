@@ -20,7 +20,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
-	"net/http"
 )
 
 type Organization struct {
@@ -38,7 +37,7 @@ type Organization struct {
 }
 
 func (c *Client) Organization(orgId string) (organization *Organization, err error) {
-	req, err := http.NewRequest("GET", c.endpoint+"/organization/"+orgId, nil)
+	req, err := c.NewRequest("GET", c.endpoint+"/organization/"+orgId, nil)
 	if err != nil {
 		return
 	}
@@ -63,7 +62,7 @@ func (c *Client) Organization(orgId string) (organization *Organization, err err
 }
 
 func (o *Organization) Members() (members []Member, err error) {
-	req, err := http.NewRequest("GET", o.client.endpoint+"/organization/"+o.Id+"/members", nil)
+	req, err := o.client.NewRequest("GET", o.client.endpoint+"/organization/"+o.Id+"/members", nil)
 	if err != nil {
 		return
 	}
