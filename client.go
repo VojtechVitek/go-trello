@@ -19,7 +19,10 @@ package trello
 import (
 	"fmt"
 	"io"
+	"io/ioutil"
 	"net/http"
+	"net/url"
+	"strings"
 )
 
 type Client struct {
@@ -30,11 +33,70 @@ type Client struct {
 	token    string
 }
 
-func (c *Client) NewRequest(method, url string, body io.Reader) (*http.Request, error) {
+func (c *Client) QueryURL(url string) (authurl string) {
 	if c.key != "" && c.token != "" {
-		return http.NewRequest(method, fmt.Sprintf("%s?key=%s&token=%s", url, c.key, c.token), nil)
+		authurl = fmt.Sprintf("%s?key=%s&token=%s", url, c.key, c.token)
+		return
 	}
-	return http.NewRequest(method, url, nil)
+	authurl = url
+	return
+}
+
+func (c *Client) Get(resource string) (body []byte, err error) {
+	req, err := c.NewRequest(
+		"GET",
+		c.endpoint+resource,
+		nil,
+	)
+	if err != nil {
+		return
+	}
+
+	resp, err := c.client.Do(req)
+	if err != nil {
+		return
+	}
+	defer resp.Body.Close()
+
+	body, err = ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return
+	} else if resp.StatusCode != 200 {
+		err = fmt.Errorf("Received unexpected status %d while trying to retrieve the server data with \"%s\"", resp.StatusCode, string(body))
+		return
+	}
+
+	return
+}
+
+func (c *Client) PostForm(resource string, data url.Values) (body []byte, err error) {
+	req, err := c.NewRequest(
+		"POST",
+		c.endpoint+resource,
+		strings.NewReader(data.Encode()),
+	)
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+
+	resp, err := c.client.Do(req)
+	if err != nil {
+		return
+	}
+	body, err = ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return
+	}
+
+	defer resp.Body.Close()
+
+	if resp.StatusCode != 200 {
+		err = fmt.Errorf("Received unexpected status %d while trying to retrieve the server data with: \"%s\"", resp.StatusCode, body)
+		return
+	}
+	return
+}
+
+func (c *Client) NewRequest(method, url string, body io.Reader) (*http.Request, error) {
+	return http.NewRequest(method, c.QueryURL(url), body)
 }
 
 func NewClient(key, token string) (*Client, error) {
