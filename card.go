@@ -20,6 +20,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"net/url"
 )
 
 type Card struct {
@@ -224,5 +225,13 @@ func (c *Card) Actions() (actions []Action, err error) {
 	for i, _ := range actions {
 		actions[i].client = c.client
 	}
+	return
+}
+
+func (c *Card) PostComment(text string) (body []byte, err error) {
+	payload := url.Values{}
+	payload.Set("text", text)
+
+	body, err = c.client.PostForm("/cards/"+c.Id+"/actions/comments", payload)
 	return
 }
