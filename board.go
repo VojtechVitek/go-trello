@@ -85,6 +85,17 @@ func (c *Client) Board(boardId string) (board *Board, err error) {
 	return
 }
 
+func (c *Client) List(listId string) (list *List, err error) {
+	body, err := c.Get("/lists/" + listId)
+	if err != nil {
+		return
+	}
+
+	err = json.Unmarshal(body, &list)
+	list.client = c
+	return
+}
+
 func (b *Board) Lists() (lists []List, err error) {
 	body, err := b.client.Get("/boards/" + b.Id + "/lists")
 	if err != nil {
