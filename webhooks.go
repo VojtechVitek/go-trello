@@ -19,7 +19,6 @@ package trello
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"net/url"
 )
 
@@ -30,6 +29,30 @@ type Webhook struct {
 	client      *Client `json:"-"`
 }
 
+func (c *Client) Webhooks() (webhooks []Webhook, err error) {
+	body, err := c.Get("/tokens/" + c.token + "/webhooks")
+	if err != nil {
+		return
+	}
+
+	err = json.Unmarshal(body, &webhooks)
+	for i, _ := range webhooks {
+		webhooks[i].client = c
+	}
+	return
+}
+
+func (c *Client) Webhook(webhookId string) (webhook *Webhook, err error) {
+	body, err := c.Get("/webhooks/" + webhookId)
+	if err != nil {
+		return
+	}
+
+	err = json.Unmarshal(body, &webhook)
+	webhook.client = c
+	return
+}
+
 func (c *Client) NewWebhook(cb, i string) (webhook *Webhook) {
 	webhook = &Webhook{
 		Description: fmt.Sprintf("Events for model \"%s\"", i),
@@ -37,31 +60,6 @@ func (c *Client) NewWebhook(cb, i string) (webhook *Webhook) {
 		IdModel:     i,
 		client:      c,
 	}
-	return
-}
-
-func (c *Client) Webhook(webhookId string) (webhook *Webhook, err error) {
-	req, err := c.NewRequest("GET", c.endpoint+"/webhooks/"+webhookId, nil)
-	if err != nil {
-		return
-	}
-
-	resp, err := c.client.Do(req)
-	if err != nil {
-		return
-	}
-	defer resp.Body.Close()
-
-	body, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return
-	} else if resp.StatusCode != 200 {
-		err = fmt.Errorf("Received unexpected status %d while trying to retrieve the server data", resp.StatusCode)
-		return
-	}
-
-	err = json.Unmarshal(body, &webhook)
-	webhook.client = c
 	return
 }
 
