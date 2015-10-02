@@ -88,3 +88,30 @@ func (o *Organization) Members() (members []Member, err error) {
 	}
 	return
 }
+
+func (o *Organization) Boards() (boards []Board, err error) {
+	req, err := http.NewRequest("GET", o.client.endpoint+"/organizations/"+o.Id+"/boards", nil)
+	if err != nil {
+		return
+	}
+
+	resp, err := o.client.client.Do(req)
+	if err != nil {
+		return
+	}
+	defer resp.Body.Close()
+
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return
+	} else if resp.StatusCode != 200 {
+		err = fmt.Errorf("Received unexpected status %d while trying to retrieve the server data", resp.StatusCode)
+		return
+	}
+
+	err = json.Unmarshal(body, &boards)
+	for i, _ := range boards {
+		boards[i].client = o.client
+	}
+	return
+}
