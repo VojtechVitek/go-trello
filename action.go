@@ -22,7 +22,20 @@ type Action struct {
 	IdMemberCreator string `json:"idMemberCreator"`
 	Data            struct {
 		DateLastEdited string `json:"dateLastEdited"`
-		TextData       struct {
+		CheckItem      struct {
+			Id    string `json:"id"`
+			State string `json:"state"`
+			Name  string `json:"name"`
+		} `json:"checkItem"`
+		CheckList struct {
+			Id   string `json:"id"`
+			Name string `json:"name"`
+		} `json:"checklist"`
+		List struct {
+			Id   string `json:"id"`
+			Name string `json:"name"`
+		} `json:"list"`
+		TextData struct {
 			Emoji struct{} `json:"emoji"`
 		} `json:"textData"`
 		Board struct {
