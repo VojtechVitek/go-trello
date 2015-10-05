@@ -22,7 +22,15 @@ type Action struct {
 	IdMemberCreator string `json:"idMemberCreator"`
 	Data            struct {
 		DateLastEdited string `json:"dateLastEdited"`
-		CheckItem      struct {
+		ListBefore     struct {
+			Id   string `json:"id"`
+			Name string `json:"name"`
+		} `json:"listBefore"`
+		ListAfter struct {
+			Id   string `json:"id"`
+			Name string `json:"name"`
+		} `json:"listAfter"`
+		CheckItem struct {
 			Id    string `json:"id"`
 			State string `json:"state"`
 			Name  string `json:"name"`
