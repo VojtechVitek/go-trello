@@ -20,7 +20,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
-	"net/http"
+	"net/url"
 )
 
 type Card struct {
@@ -71,7 +71,7 @@ type Card struct {
 }
 
 func (c *Client) Card(CardId string) (card *Card, err error) {
-	req, err := http.NewRequest("GET", c.endpoint+"/card/"+CardId, nil)
+	req, err := c.NewRequest("GET", c.endpoint+"/card/"+CardId, nil)
 	if err != nil {
 		return
 	}
@@ -96,7 +96,7 @@ func (c *Client) Card(CardId string) (card *Card, err error) {
 }
 
 func (c *Card) Checklists() (checklists []Checklist, err error) {
-	req, err := http.NewRequest("GET", c.client.endpoint+"/card/"+c.Id+"/checklists", nil)
+	req, err := c.client.NewRequest("GET", c.client.endpoint+"/card/"+c.Id+"/checklists", nil)
 	if err != nil {
 		return
 	}
@@ -123,7 +123,7 @@ func (c *Card) Checklists() (checklists []Checklist, err error) {
 }
 
 func (c *Card) Members() (members []Member, err error) {
-	req, err := http.NewRequest("GET", c.client.endpoint+"/cards/"+c.Id+"/members", nil)
+	req, err := c.client.NewRequest("GET", c.client.endpoint+"/cards/"+c.Id+"/members", nil)
 	if err != nil {
 		return
 	}
@@ -150,7 +150,7 @@ func (c *Card) Members() (members []Member, err error) {
 }
 
 func (c *Card) Attachments() (attachments []Attachment, err error) {
-	req, err := http.NewRequest("GET", c.client.endpoint+"/cards/"+c.Id+"/attachments", nil)
+	req, err := c.client.NewRequest("GET", c.client.endpoint+"/cards/"+c.Id+"/attachments", nil)
 	if err != nil {
 		return
 	}
@@ -176,8 +176,33 @@ func (c *Card) Attachments() (attachments []Attachment, err error) {
 	return
 }
 
+func (c *Card) Attachment(attachmentId string) (attachment Attachment, err error) {
+	req, err := c.client.NewRequest("GET", c.client.endpoint+"/cards/"+c.Id+"/attachments/"+attachmentId, nil)
+	if err != nil {
+		return
+	}
+
+	resp, err := c.client.client.Do(req)
+	if err != nil {
+		return
+	}
+	defer resp.Body.Close()
+
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return
+	} else if resp.StatusCode != 200 {
+		err = fmt.Errorf("Received unexpected status %d while trying to retrieve the server data", resp.StatusCode)
+		return
+	}
+
+	err = json.Unmarshal(body, &attachment)
+	attachment.client = c.client
+	return
+}
+
 func (c *Card) Actions() (actions []Action, err error) {
-	req, err := http.NewRequest("GET", c.client.endpoint+"/cards/"+c.Id+"/actions", nil)
+	req, err := c.client.NewRequest("GET", c.client.endpoint+"/cards/"+c.Id+"/actions", nil)
 	if err != nil {
 		return
 	}
@@ -200,5 +225,13 @@ func (c *Card) Actions() (actions []Action, err error) {
 	for i, _ := range actions {
 		actions[i].client = c.client
 	}
+	return
+}
+
+func (c *Card) PostComment(text string) (body []byte, err error) {
+	payload := url.Values{}
+	payload.Set("text", text)
+
+	body, err = c.client.PostForm("/cards/"+c.Id+"/actions/comments", payload)
 	return
 }
