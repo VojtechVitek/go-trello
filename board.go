@@ -23,17 +23,23 @@ import (
 	"net/http"
 )
 
+var (
+	_ = fmt.Printf
+)
+
 type Board struct {
-	client         *Client
-	Id             string   `json:"id"`
-	Name           string   `json:"name"`
-	Desc           string   `json:"desc"`
-	DescData       string   `json:"descData"`
-	Closed         bool     `json:"closed"`
-	IdOrganization string   `json:"idOrganization"`
-	Pinned         []string `json:"pinned"`
-	Url            string   `json:"url"`
-	ShortUrl       string   `json:"shortUrl`
+	client   *Client
+	Id       string `json:"id"`
+	Name     string `json:"name"`
+	Desc     string `json:"desc"`
+	DescData struct {
+		Emoji struct{} `json:"emoji"`
+	} `json:"descData"`
+	Closed         bool   `json:"closed"`
+	IdOrganization string `json:"idOrganization"`
+	Pinned         bool   `json:"pinned"`
+	Url            string `json:"url"`
+	ShortUrl       string `json:"shortUrl`
 	Prefs          struct {
 		PermissionLevel       string `json:"permissionLevel"`
 		Voting                string `json:"voting"`
@@ -110,7 +116,7 @@ func (b *Board) Lists() (lists []List, err error) {
 	}
 
 	err = json.Unmarshal(body, &lists)
-	for i, _ := range lists {
+	for i := range lists {
 		lists[i].client = b.client
 	}
 	return
@@ -161,7 +167,7 @@ func (b *Board) Cards() (cards []Card, err error) {
 	}
 
 	err = json.Unmarshal(body, &cards)
-	for i, _ := range cards {
+	for i := range cards {
 		cards[i].client = b.client
 	}
 	return
@@ -213,7 +219,7 @@ func (b *Board) Checklists() (checklists []Checklist, err error) {
 	}
 
 	err = json.Unmarshal(body, &checklists)
-	for i, _ := range checklists {
+	for i := range checklists {
 		checklists[i].client = b.client
 	}
 	return
@@ -240,7 +246,7 @@ func (b *Board) MemberCards(IdMember string) (cards []Card, err error) {
 	}
 
 	err = json.Unmarshal(body, &cards)
-	for i, _ := range cards {
+	for i := range cards {
 		cards[i].client = b.client
 	}
 	return
@@ -267,7 +273,7 @@ func (b *Board) Actions() (actions []Action, err error) {
 	}
 
 	err = json.Unmarshal(body, &actions)
-	for i, _ := range actions {
+	for i := range actions {
 		actions[i].client = b.client
 	}
 	return
