@@ -23,7 +23,7 @@ import (
 )
 
 func TestCreateTrelloClient(t *testing.T) {
-	_, err := trello.NewClient()
+	_, err := trello.NewClient(nil)
 	if err != nil {
 		t.Errorf("Failed to create Trello client.")
 	}
