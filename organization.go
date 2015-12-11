@@ -18,9 +18,6 @@ package trello
 
 import (
 	"encoding/json"
-	"fmt"
-	"io/ioutil"
-	"net/http"
 )
 
 type Organization struct {
@@ -38,22 +35,8 @@ type Organization struct {
 }
 
 func (c *Client) Organization(orgId string) (organization *Organization, err error) {
-	req, err := http.NewRequest("GET", c.endpoint+"/organization/"+orgId, nil)
+	body, err := c.Get("/organization/" + orgId)
 	if err != nil {
-		return
-	}
-
-	resp, err := c.client.Do(req)
-	if err != nil {
-		return
-	}
-	defer resp.Body.Close()
-
-	body, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return
-	} else if resp.StatusCode != 200 {
-		err = fmt.Errorf("Received unexpected status %d while trying to retrieve the server data", resp.StatusCode)
 		return
 	}
 
@@ -63,54 +46,26 @@ func (c *Client) Organization(orgId string) (organization *Organization, err err
 }
 
 func (o *Organization) Members() (members []Member, err error) {
-	req, err := http.NewRequest("GET", o.client.endpoint+"/organization/"+o.Id+"/members", nil)
+	body, err := o.client.Get("/organization/" + o.Id + "/members")
 	if err != nil {
-		return
-	}
-
-	resp, err := o.client.client.Do(req)
-	if err != nil {
-		return
-	}
-	defer resp.Body.Close()
-
-	body, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return
-	} else if resp.StatusCode != 200 {
-		err = fmt.Errorf("Received unexpected status %d while trying to retrieve the server data", resp.StatusCode)
 		return
 	}
 
 	err = json.Unmarshal(body, &members)
-	for i, _ := range members {
+	for i := range members {
 		members[i].client = o.client
 	}
 	return
 }
 
 func (o *Organization) Boards() (boards []Board, err error) {
-	req, err := http.NewRequest("GET", o.client.endpoint+"/organizations/"+o.Id+"/boards", nil)
+	body, err := o.client.Get("/organizations/" + o.Id + "/boards")
 	if err != nil {
-		return
-	}
-
-	resp, err := o.client.client.Do(req)
-	if err != nil {
-		return
-	}
-	defer resp.Body.Close()
-
-	body, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return
-	} else if resp.StatusCode != 200 {
-		err = fmt.Errorf("Received unexpected status %d while trying to retrieve the server data", resp.StatusCode)
 		return
 	}
 
 	err = json.Unmarshal(body, &boards)
-	for i, _ := range boards {
+	for i := range boards {
 		boards[i].client = o.client
 	}
 	return

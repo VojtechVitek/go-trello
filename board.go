@@ -18,13 +18,6 @@ package trello
 
 import (
 	"encoding/json"
-	"fmt"
-	"io/ioutil"
-	"net/http"
-)
-
-var (
-	_ = fmt.Printf
 )
 
 type Board struct {
@@ -70,23 +63,22 @@ type Board struct {
 	} `json:"labelNames"`
 }
 
+func (c *Client) Boards() (boards []Board, err error) {
+	body, err := c.Get("/boards/")
+	if err != nil {
+		return
+	}
+
+	err = json.Unmarshal(body, &boards)
+	for i := range boards {
+		boards[i].client = c
+	}
+	return
+}
+
 func (c *Client) Board(boardId string) (board *Board, err error) {
-	req, err := http.NewRequest("GET", c.endpoint+"/boards/"+boardId, nil)
+	body, err := c.Get("/boards/" + boardId)
 	if err != nil {
-		return
-	}
-
-	resp, err := c.client.Do(req)
-	if err != nil {
-		return
-	}
-	defer resp.Body.Close()
-
-	body, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return
-	} else if resp.StatusCode != 200 {
-		err = fmt.Errorf("Received unexpected status %d while trying to retrieve the server data", resp.StatusCode)
 		return
 	}
 
@@ -96,22 +88,8 @@ func (c *Client) Board(boardId string) (board *Board, err error) {
 }
 
 func (b *Board) Lists() (lists []List, err error) {
-	req, err := http.NewRequest("GET", b.client.endpoint+"/boards/"+b.Id+"/lists", nil)
+	body, err := b.client.Get("/boards/" + b.Id + "/lists")
 	if err != nil {
-		return
-	}
-
-	resp, err := b.client.client.Do(req)
-	if err != nil {
-		return
-	}
-	defer resp.Body.Close()
-
-	body, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return
-	} else if resp.StatusCode != 200 {
-		err = fmt.Errorf("Received unexpected status %d while trying to retrieve the server data", resp.StatusCode)
 		return
 	}
 
@@ -123,46 +101,21 @@ func (b *Board) Lists() (lists []List, err error) {
 }
 
 func (b *Board) Members() (members []Member, err error) {
-	req, err := http.NewRequest("GET", b.client.endpoint+"/boards/"+b.Id+"/members", nil)
+	body, err := b.client.Get("/boards/" + b.Id + "/members")
 	if err != nil {
-		return
-	}
-
-	resp, err := b.client.client.Do(req)
-	if err != nil {
-		return
-	}
-	defer resp.Body.Close()
-
-	body, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return
-	} else if resp.StatusCode != 200 {
-		err = fmt.Errorf("Received unexpected status %d while trying to retrieve the server data", resp.StatusCode)
 		return
 	}
 
 	err = json.Unmarshal(body, &members)
+	for i := range members {
+		members[i].client = b.client
+	}
 	return
 }
 
 func (b *Board) Cards() (cards []Card, err error) {
-	req, err := http.NewRequest("GET", b.client.endpoint+"/boards/"+b.Id+"/cards", nil)
+	body, err := b.client.Get("/boards/" + b.Id + "/cards")
 	if err != nil {
-		return
-	}
-
-	resp, err := b.client.client.Do(req)
-	if err != nil {
-		return
-	}
-	defer resp.Body.Close()
-
-	body, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return
-	} else if resp.StatusCode != 200 {
-		err = fmt.Errorf("Received unexpected status %d while trying to retrieve the server data", resp.StatusCode)
 		return
 	}
 
@@ -174,22 +127,8 @@ func (b *Board) Cards() (cards []Card, err error) {
 }
 
 func (b *Board) Card(IdCard string) (card *Card, err error) {
-	req, err := http.NewRequest("GET", b.client.endpoint+"/boards/"+b.Id+"/cards/"+IdCard, nil)
+	body, err := b.client.Get("/boards/" + b.Id + "/cards/" + IdCard)
 	if err != nil {
-		return
-	}
-
-	resp, err := b.client.client.Do(req)
-	if err != nil {
-		return
-	}
-	defer resp.Body.Close()
-
-	body, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return
-	} else if resp.StatusCode != 200 {
-		err = fmt.Errorf("Received unexpected status %d while trying to retrieve the server data", resp.StatusCode)
 		return
 	}
 
@@ -199,22 +138,8 @@ func (b *Board) Card(IdCard string) (card *Card, err error) {
 }
 
 func (b *Board) Checklists() (checklists []Checklist, err error) {
-	req, err := http.NewRequest("GET", b.client.endpoint+"/boards/"+b.Id+"/checklists", nil)
+	body, err := b.client.Get("/boards/" + b.Id + "/checklists")
 	if err != nil {
-		return
-	}
-
-	resp, err := b.client.client.Do(req)
-	if err != nil {
-		return
-	}
-	defer resp.Body.Close()
-
-	body, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return
-	} else if resp.StatusCode != 200 {
-		err = fmt.Errorf("Received unexpected status %d while trying to retrieve the server data", resp.StatusCode)
 		return
 	}
 
@@ -226,22 +151,8 @@ func (b *Board) Checklists() (checklists []Checklist, err error) {
 }
 
 func (b *Board) MemberCards(IdMember string) (cards []Card, err error) {
-	req, err := http.NewRequest("GET", b.client.endpoint+"/boards/"+b.Id+"/members/"+IdMember+"/cards", nil)
+	body, err := b.client.Get("/boards/" + b.Id + "/members/" + IdMember + "/cards")
 	if err != nil {
-		return
-	}
-
-	resp, err := b.client.client.Do(req)
-	if err != nil {
-		return
-	}
-	defer resp.Body.Close()
-
-	body, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return
-	} else if resp.StatusCode != 200 {
-		err = fmt.Errorf("Received unexpected status %d while trying to retrieve the server data", resp.StatusCode)
 		return
 	}
 
@@ -253,22 +164,8 @@ func (b *Board) MemberCards(IdMember string) (cards []Card, err error) {
 }
 
 func (b *Board) Actions() (actions []Action, err error) {
-	req, err := http.NewRequest("GET", b.client.endpoint+"/boards/"+b.Id+"/actions", nil)
+	body, err := b.client.Get("/boards/" + b.Id + "/actions")
 	if err != nil {
-		return
-	}
-
-	resp, err := b.client.client.Do(req)
-	if err != nil {
-		return
-	}
-	defer resp.Body.Close()
-
-	body, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return
-	} else if resp.StatusCode != 200 {
-		err = fmt.Errorf("Received unexpected status %d while trying to retrieve the server data", resp.StatusCode)
 		return
 	}
 

@@ -18,9 +18,6 @@ package trello
 
 import (
 	"encoding/json"
-	"fmt"
-	"io/ioutil"
-	"net/http"
 )
 
 type List struct {
@@ -33,27 +30,13 @@ type List struct {
 }
 
 func (l *List) Cards() (cards []Card, err error) {
-	req, err := http.NewRequest("GET", l.client.endpoint+"/lists/"+l.Id+"/cards", nil)
+	body, err := l.client.Get("/lists/" + l.Id + "/cards")
 	if err != nil {
-		return
-	}
-
-	resp, err := l.client.client.Do(req)
-	if err != nil {
-		return
-	}
-	defer resp.Body.Close()
-
-	body, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return
-	} else if resp.StatusCode != 200 {
-		err = fmt.Errorf("Received unexpected status %d while trying to retrieve the server data", resp.StatusCode)
 		return
 	}
 
 	err = json.Unmarshal(body, &cards)
-	for i, _ := range cards {
+	for i := range cards {
 		cards[i].client = l.client
 	}
 	return

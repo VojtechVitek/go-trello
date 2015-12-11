@@ -17,6 +17,8 @@ limitations under the License.
 package trello
 
 import (
+	"fmt"
+	"io/ioutil"
 	"net/http"
 )
 
@@ -24,6 +26,29 @@ type Client struct {
 	client   *http.Client
 	endpoint string
 	version  string
+}
+
+func (c *Client) Get(resource string) (body []byte, err error) {
+	req, err := http.NewRequest("GET", c.endpoint+resource, nil)
+	if err != nil {
+		return
+	}
+
+	resp, err := c.client.Do(req)
+	if err != nil {
+		return
+	}
+	defer resp.Body.Close()
+
+	body, err = ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return
+	} else if resp.StatusCode != 200 {
+		err = fmt.Errorf("Received unexpected status %d while trying to retrieve the server data with \"%s\"", resp.StatusCode, string(body))
+		return
+	}
+
+	return
 }
 
 type bearerRoundTripper struct {
