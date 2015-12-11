@@ -20,6 +20,8 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"net/url"
+	"strings"
 )
 
 type Client struct {
@@ -28,27 +30,40 @@ type Client struct {
 	version  string
 }
 
-func (c *Client) Get(resource string) (body []byte, err error) {
-	req, err := http.NewRequest("GET", c.endpoint+resource, nil)
-	if err != nil {
-		return
-	}
-
+func (c *Client) do(req *http.Request) ([]byte, error) {
 	resp, err := c.client.Do(req)
 	if err != nil {
-		return
+		return nil, err
 	}
 	defer resp.Body.Close()
 
-	body, err = ioutil.ReadAll(resp.Body)
+	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		return
-	} else if resp.StatusCode != 200 {
-		err = fmt.Errorf("Received unexpected status %d while trying to retrieve the server data with \"%s\"", resp.StatusCode, string(body))
-		return
+		return nil, err
 	}
+	if resp.StatusCode != 200 {
+		err = fmt.Errorf("Received unexpected status %d while trying to retrieve the server data with \"%s\"", resp.StatusCode, string(body))
+		return nil, err
+	}
+	return body, nil
+}
 
-	return
+func (c *Client) Get(resource string) ([]byte, error) {
+	req, err := http.NewRequest("GET", c.endpoint+resource, nil)
+	if err != nil {
+		return nil, err
+	}
+	return c.do(req)
+}
+
+func (c *Client) Post(resource string, data url.Values) ([]byte, error) {
+	req, err := http.NewRequest("POST", c.endpoint+resource, strings.NewReader(data.Encode()))
+	if err != nil {
+		return nil, err
+	}
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+
+	return c.do(req)
 }
 
 type bearerRoundTripper struct {
