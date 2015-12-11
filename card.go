@@ -18,6 +18,7 @@ package trello
 
 import (
 	"encoding/json"
+	"net/url"
 )
 
 type Card struct {
@@ -86,7 +87,13 @@ func (c *Card) Checklists() (checklists []Checklist, err error) {
 
 	err = json.Unmarshal(body, &checklists)
 	for i := range checklists {
-		checklists[i].client = c.client
+		list := &checklists[i]
+		list.client = c.client
+		for i := range list.CheckItems {
+			item := &list.CheckItems[i]
+			item.client = c.client
+			item.listID = list.Id
+		}
 	}
 	return
 }
@@ -128,4 +135,23 @@ func (c *Card) Actions() (actions []Action, err error) {
 		actions[i].client = c.client
 	}
 	return
+}
+
+// AddChecklist will add a checklist to the card.
+// https://developers.trello.com/advanced-reference/card#post-1-cards-card-id-or-shortlink-checklists
+func (c *Card) AddChecklist(name string) (*Checklist, error) {
+	newList := &Checklist{}
+
+	payload := url.Values{}
+	payload.Set("name", name)
+	body, err := c.client.Post("/cards/"+c.Id+"/checklists", payload)
+	if err != nil {
+		return nil, err
+	}
+	if err = json.Unmarshal(body, newList); err != nil {
+		return nil, err
+	}
+	newList.client = c.client
+	// the new list has no items, no need to walk those adding client
+	return newList, err
 }

@@ -66,6 +66,15 @@ func (c *Client) Post(resource string, data url.Values) ([]byte, error) {
 	return c.do(req)
 }
 
+func (c *Client) Delete(resource string) ([]byte, error) {
+	req, err := http.NewRequest("DELETE", c.endpoint+resource, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return c.do(req)
+}
+
 type bearerRoundTripper struct {
 	Delegate http.RoundTripper
 	key      string
