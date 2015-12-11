@@ -16,22 +16,58 @@ limitations under the License.
 
 package trello
 
-import "net/http"
+import (
+	"net/http"
+)
 
 type Client struct {
-	// Auth
-
 	client   *http.Client
 	endpoint string
 	version  string
 }
 
-func NewClient() (*Client, error) {
+type bearerRoundTripper struct {
+	Delegate http.RoundTripper
+	key      string
+	token    string
+}
+
+func (b *bearerRoundTripper) RoundTrip(req *http.Request) (*http.Response, error) {
+	if b.Delegate == nil {
+		b.Delegate = http.DefaultTransport
+	}
+	values := req.URL.Query()
+	values.Add("key", b.key)
+	values.Add("token", b.token)
+	req.URL.RawQuery = values.Encode()
+	return b.Delegate.RoundTrip(req)
+}
+
+// NewBearerTokenTransport will return an http.RoundTripper which will add the
+// provided application id and token to API calls.
+//   If Delegate is left unset the http.DefaultTransport will be used.
+// See https://trello.com/app-key to get your applicationKey
+// See https://trello.com/1/connect?key=MYKEYFROMABOVE&name=MYAPPNAME&response_type=token&scope=read,write&expiration=1d
+// to get a read/write token good for 1 day
+func NewBearerTokenTransport(applicationKey string, token string) *bearerRoundTripper {
+	return &bearerRoundTripper{
+		key:   applicationKey,
+		token: token,
+	}
+}
+
+// NewClient returns a client needed to make trello API calls. If transport is nil
+// all API calls will be unauthenticated. If you have a bearer token, NewBearerTokenTransport()
+// may be helpful in making calls authenticated.
+func NewClient(transport http.RoundTripper) (*Client, error) {
 	version := "1"
 	endpoint := "https://api.trello.com/" + version
 
+	client := &http.Client{
+		Transport: transport,
+	}
 	return &Client{
-		client:   http.DefaultClient,
+		client:   client,
 		endpoint: endpoint,
 		version:  version,
 	}, nil
