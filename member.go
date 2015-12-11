@@ -31,10 +31,10 @@ type Member struct {
 	BioData                  string   `json:"bioData"`
 	Confirmed                bool     `json:"confirmed"`
 	FullName                 string   `json:"fullName"`
-	IdPremOrgsAdmin          string   `json:"idPremOrgsAdmin"`
+	IdPremOrgsAdmin          []string `json:"idPremOrgsAdmin"`
 	Initials                 string   `json:"initials"`
 	MemberType               string   `json:"memberType"`
-	Products                 []string `json:"products"`
+	Products                 []int    `json:"products"`
 	Status                   string   `json:"status"`
 	Url                      string   `json:"url"`
 	Username                 string   `json:"username"`
@@ -46,11 +46,17 @@ type Member struct {
 	IdOrganizations          []string `json:"idOrganizations"`
 	LoginTypes               string   `json:"loginTypes"`
 	NewEmail                 string   `json:"newEmail"`
-	OneTimeMessagesDismissed string   `json:"oneTimeMessagesDismissed"`
-	Prefs                    string   `json:"prefs"`
-	Trophies                 []string `json:"trophies"`
-	UploadedAvatarHash       string   `json:"uploadedAvatarHash"`
-	PremiumFeatures          []string `json:"premiumFeatures"`
+	OneTimeMessagesDismissed []string `json:"oneTimeMessagesDismissed"`
+	Prefs                    struct {
+		SendSummaries                 bool   `json:"sendSummaries"`
+		MinutesBetweenSummaries       int    `json:"minutesBetweenSummaries"`
+		MinutesBeforeDeadlineToNotify int    `json:"minutesBeforeDeadlineToNotify"`
+		ColorBlind                    bool   `json:"colorBlind"`
+		Locale                        string `json:"locale"`
+	} `json:"prefs"`
+	Trophies           []string `json:"trophies"`
+	UploadedAvatarHash string   `json:"uploadedAvatarHash"`
+	PremiumFeatures    []string `json:"premiumFeatures"`
 }
 
 func (c *Client) Member(nick string) (member *Member, err error) {
