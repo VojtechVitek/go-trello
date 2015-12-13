@@ -11,7 +11,7 @@ go-trello is a [Go](http://golang.org/) client package for accessing the [Trello
 Example
 -------
 
-```
+```go
 package main
 
 import (
