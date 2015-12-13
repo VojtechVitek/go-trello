@@ -1,9 +1,9 @@
-Go Trello client
-----------------
-This [Go](http://golang.org/) package implements the [Trello](http://www.trello.com/) [API](http://trello.com/api).
+Golang Trello API client
+------------------------
+go-trello is a [Go](http://golang.org/) client package for accessing the [Trello](http://www.trello.com/) [API](http://trello.com/api).
 
 <a href="http://golang.org"><img alt="Go package" src="https://golang.org/doc/gopher/pencil/gopherhat.jpg" width="20%" /></a>
-<a href="http://trello.com"><img alt="Trello API" src="https://trello-attachments.s3.amazonaws.com/4f84a60f0cbdcb7e7d40e099/50240e2753f944277f3a6a36/7579ae47b098230a1d296e1ef6a98986/Trello-Logo.png" width="70%" /></a>
+<a href="http://trello.com"><img src="https://d2k1ftgv7pobq7.cloudfront.net/meta/p/res/images/c13d1cd96a2cff30f0460a5e1860c5ea/header-logo-blue.svg" style="height: 80px; margin-bottom: 2em;"></a>
 
 [![GoDoc](https://godoc.org/github.com/VojtechVitek/go-trello?status.png)](https://godoc.org/github.com/VojtechVitek/go-trello)
 [![Travis](https://travis-ci.org/VojtechVitek/go-trello.svg?branch=master)](https://travis-ci.org/VojtechVitek/go-trello)
@@ -21,21 +21,34 @@ import (
 
 func main() {
 	// New Trello Client
-	trello, _ := trello.NewClient()
+	trello, err := trello.NewAuthClient("application-key", "token")
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	// User @trello
-	user, _ := trello.Member("trello")
+	user, err := trello.Member("trello")
+	if err != nil {
+		log.Fatal(err)
+	}
 	fmt.Println(user.FullName)
 
 	// @trello Boards
-	boards, _ := user.Boards()
+	boards, err := user.Boards()
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	if len(boards) > 0 {
 		board := boards[0]
 		fmt.Printf("* %v (%v)\n", board.Name, board.ShortUrl)
 
 		// @trello Board Lists
-		lists, _ := board.Lists()
+		lists, err := board.Lists()
+		if err != nil {
+			log.Fatal(err)
+		}
+
 		for _, list := range lists {
 			fmt.Println("   - ", list.Name)
 
@@ -79,4 +92,4 @@ Influenced by
 
 License
 -------
-Go Trello client is licensed under the [Apache License, Version 2.0](http://www.apache.org/licenses/LICENSE-2.0).
+Licensed under the [Apache License, Version 2.0](http://www.apache.org/licenses/LICENSE-2.0).
