@@ -18,9 +18,6 @@ package trello
 
 import (
 	"encoding/json"
-	"fmt"
-	"io/ioutil"
-	"net/http"
 )
 
 type Member struct {
@@ -31,10 +28,10 @@ type Member struct {
 	BioData                  string   `json:"bioData"`
 	Confirmed                bool     `json:"confirmed"`
 	FullName                 string   `json:"fullName"`
-	IdPremOrgsAdmin          string   `json:"idPremOrgsAdmin"`
+	IdPremOrgsAdmin          []string `json:"idPremOrgsAdmin"`
 	Initials                 string   `json:"initials"`
 	MemberType               string   `json:"memberType"`
-	Products                 []string `json:"products"`
+	Products                 []int    `json:"products"`
 	Status                   string   `json:"status"`
 	Url                      string   `json:"url"`
 	Username                 string   `json:"username"`
@@ -46,30 +43,22 @@ type Member struct {
 	IdOrganizations          []string `json:"idOrganizations"`
 	LoginTypes               string   `json:"loginTypes"`
 	NewEmail                 string   `json:"newEmail"`
-	OneTimeMessagesDismissed string   `json:"oneTimeMessagesDismissed"`
-	Prefs                    string   `json:"prefs"`
-	Trophies                 []string `json:"trophies"`
-	UploadedAvatarHash       string   `json:"uploadedAvatarHash"`
-	PremiumFeatures          []string `json:"premiumFeatures"`
+	OneTimeMessagesDismissed []string `json:"oneTimeMessagesDismissed"`
+	Prefs                    struct {
+		SendSummaries                 bool   `json:"sendSummaries"`
+		MinutesBetweenSummaries       int    `json:"minutesBetweenSummaries"`
+		MinutesBeforeDeadlineToNotify int    `json:"minutesBeforeDeadlineToNotify"`
+		ColorBlind                    bool   `json:"colorBlind"`
+		Locale                        string `json:"locale"`
+	} `json:"prefs"`
+	Trophies           []string `json:"trophies"`
+	UploadedAvatarHash string   `json:"uploadedAvatarHash"`
+	PremiumFeatures    []string `json:"premiumFeatures"`
 }
 
 func (c *Client) Member(nick string) (member *Member, err error) {
-	req, err := http.NewRequest("GET", c.endpoint+"/member/"+nick, nil)
+	body, err := c.Get("/member/" + nick)
 	if err != nil {
-		return
-	}
-
-	resp, err := c.client.Do(req)
-	if err != nil {
-		return
-	}
-	defer resp.Body.Close()
-
-	body, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return
-	} else if resp.StatusCode != 200 {
-		err = fmt.Errorf("Received unexpected status %d while trying to retrieve the server data", resp.StatusCode)
 		return
 	}
 
@@ -79,27 +68,13 @@ func (c *Client) Member(nick string) (member *Member, err error) {
 }
 
 func (m *Member) Boards() (boards []Board, err error) {
-	req, err := http.NewRequest("GET", m.client.endpoint+"/member/"+m.Id+"/boards", nil)
+	body, err := m.client.Get("/member/" + m.Id + "/boards")
 	if err != nil {
-		return
-	}
-
-	resp, err := m.client.client.Do(req)
-	if err != nil {
-		return
-	}
-	defer resp.Body.Close()
-
-	body, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return
-	} else if resp.StatusCode != 200 {
-		err = fmt.Errorf("Received unexpected status %d while trying to retrieve the server data", resp.StatusCode)
 		return
 	}
 
 	err = json.Unmarshal(body, &boards)
-	for i, _ := range boards {
+	for i := range boards {
 		boards[i].client = m.client
 	}
 	return
