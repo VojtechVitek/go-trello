@@ -124,6 +124,20 @@ func (c *Card) Attachments() (attachments []Attachment, err error) {
 	return
 }
 
+// Attachment will return the specified attachment on the card
+// https://developers.trello.com/advanced-reference/card#get-1-cards-card-id-or-shortlink-attachments-idattachment
+func (c *Card) Attachment(attachmentId string) (*Attachment, error) {
+	body, err := c.client.Get("/cards/" + c.Id + "/attachments/" + attachmentId)
+	if err != nil {
+		return nil, err
+	}
+
+	attachment := &Attachment{}
+	err = json.Unmarshal(body, attachment)
+	attachment.client = c.client
+	return attachment, err
+}
+
 func (c *Card) Actions() (actions []Action, err error) {
 	body, err := c.client.Get("/cards/" + c.Id + "/actions")
 	if err != nil {
@@ -154,4 +168,14 @@ func (c *Card) AddChecklist(name string) (*Checklist, error) {
 	newList.client = c.client
 	// the new list has no items, no need to walk those adding client
 	return newList, err
+}
+
+// AddComment will add a new comment to the card
+// https://developers.trello.com/advanced-reference/card#post-1-cards-card-id-or-shortlink-actions-comments
+func (c *Card) AddComment(text string) ([]byte, error) {
+	payload := url.Values{}
+	payload.Set("text", text)
+
+	body, err := c.client.Post("/cards/"+c.Id+"/actions/comments", payload)
+	return body, err
 }
