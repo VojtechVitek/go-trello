@@ -16,9 +16,7 @@ limitations under the License.
 
 package trello
 
-import (
-	"encoding/json"
-)
+import "encoding/json"
 
 type Board struct {
 	client   *Client
@@ -34,24 +32,24 @@ type Board struct {
 	Url            string `json:"url"`
 	ShortUrl       string `json:"shortUrl"`
 	Prefs          struct {
-		PermissionLevel       string `json:"permissionLevel"`
-		Voting                string `json:"voting"`
-		Comments              string `json:"comments"`
-		Invitations           string `json:"invitations"`
-		SelfJoin              bool   `json:"selfjoin"`
-		CardCovers            bool   `json:"cardCovers"`
-		CardAging             string `json:"cardAging"`
-		CalendarFeedEnabled   bool   `json:"calendarFeedEnabled"`
-		Background            string `json:"background"`
-		BackgroundColor       string `json:"backgroundColor"`
-		BackgroundImage       string `json:"backgroundImage"`
-		BackgroundImageScaled string `json:"backgroundImageScaled"`
-		BackgroundTile        bool   `json:"backgroundTile"`
-		BackgroundBrightness  string `json:"backgroundBrightness"`
-		CanBePublic           bool   `json:"canBePublic"`
-		CanBeOrg              bool   `json:"canBeOrg"`
-		CanBePrivate          bool   `json:"canBePrivate"`
-		CanInvite             bool   `json:"canInvite"`
+		PermissionLevel       string            `json:"permissionLevel"`
+		Voting                string            `json:"voting"`
+		Comments              string            `json:"comments"`
+		Invitations           string            `json:"invitations"`
+		SelfJoin              bool              `json:"selfjoin"`
+		CardCovers            bool              `json:"cardCovers"`
+		CardAging             string            `json:"cardAging"`
+		CalendarFeedEnabled   bool              `json:"calendarFeedEnabled"`
+		Background            string            `json:"background"`
+		BackgroundColor       string            `json:"backgroundColor"`
+		BackgroundImage       string            `json:"backgroundImage"`
+		BackgroundImageScaled []BoardBackground `json:"backgroundImageScaled"`
+		BackgroundTile        bool              `json:"backgroundTile"`
+		BackgroundBrightness  string            `json:"backgroundBrightness"`
+		CanBePublic           bool              `json:"canBePublic"`
+		CanBeOrg              bool              `json:"canBeOrg"`
+		CanBePrivate          bool              `json:"canBePrivate"`
+		CanInvite             bool              `json:"canInvite"`
 	} `json:"prefs"`
 	LabelNames struct {
 		Red    string `json:"red"`
@@ -61,6 +59,12 @@ type Board struct {
 		Blue   string `json:"blue"`
 		Purple string `json:"purple"`
 	} `json:"labelNames"`
+}
+
+type BoardBackground struct {
+	width  int    `json:"width"`
+	height int    `json:"height"`
+	url    string `json:"url"`
 }
 
 func (c *Client) Boards() (boards []Board, err error) {
