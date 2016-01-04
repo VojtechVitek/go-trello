@@ -16,12 +16,16 @@ package main
 
 import (
 	"fmt"
+	"log"
+
 	"github.com/VojtechVitek/go-trello"
 )
 
 func main() {
 	// New Trello Client
-	trello, err := trello.NewAuthClient("application-key", "token")
+	appKey := "application-key"
+	token := "token"
+	trello, err := trello.NewAuthClient(appKey, &token)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -59,6 +63,7 @@ func main() {
 			}
 		}
 	}
+}
 ```
 
 prints

@@ -18,6 +18,7 @@ package trello
 
 import (
 	"encoding/json"
+	"strings"
 )
 
 type Member struct {
@@ -57,7 +58,7 @@ type Member struct {
 }
 
 func (c *Client) Member(nick string) (member *Member, err error) {
-	body, err := c.Get("/member/" + nick)
+	body, err := c.Get("/members/" + nick)
 	if err != nil {
 		return
 	}
@@ -67,8 +68,15 @@ func (c *Client) Member(nick string) (member *Member, err error) {
 	return
 }
 
-func (m *Member) Boards() (boards []Board, err error) {
-	body, err := m.client.Get("/member/" + m.Id + "/boards")
+func (m *Member) Boards(field ...string) (boards []Board, err error) {
+	fields := ""
+	if len(field) == 0 {
+		fields = "all"
+	} else {
+		fields = strings.Join(field, ",")
+	}
+
+	body, err := m.client.Get("/members/" + m.Id + "/boards?fields=" + fields)
 	if err != nil {
 		return
 	}
