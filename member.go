@@ -22,11 +22,14 @@ import (
 )
 
 type Member struct {
-	client                   *Client
-	Id                       string   `json:"id"`
-	AvatarHash               string   `json:"avatarHash"`
-	Bio                      string   `json:"bio"`
-	BioData                  string   `json:"bioData"`
+	client     *Client
+	Id         string `json:"id"`
+	AvatarHash string `json:"avatarHash"`
+	Bio        string `json:"bio"`
+	BioData    struct {
+		Emoji struct {
+		} `json:"emoji"`
+	} `json:"bioData"`
 	Confirmed                bool     `json:"confirmed"`
 	FullName                 string   `json:"fullName"`
 	IdPremOrgsAdmin          []string `json:"idPremOrgsAdmin"`
