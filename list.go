@@ -29,6 +29,17 @@ type List struct {
 	Pos     float32 `json:"pos"`
 }
 
+func (c *Client) List(listId string) (list *List, err error) {
+	body, err := c.Get("/lists/" + listId)
+	if err != nil {
+		return
+	}
+
+	err = json.Unmarshal(body, &list)
+	list.client = c
+	return
+}
+
 func (l *List) Cards() (cards []Card, err error) {
 	body, err := l.client.Get("/lists/" + l.Id + "/cards")
 	if err != nil {
@@ -38,6 +49,19 @@ func (l *List) Cards() (cards []Card, err error) {
 	err = json.Unmarshal(body, &cards)
 	for i := range cards {
 		cards[i].client = l.client
+	}
+	return
+}
+
+func (l *List) Actions() (actions []Action, err error) {
+	body, err := l.client.Get("/lists/" + l.Id + "/actions")
+	if err != nil {
+		return
+	}
+
+	err = json.Unmarshal(body, &actions)
+	for i := range actions {
+		actions[i].client = l.client
 	}
 	return
 }
