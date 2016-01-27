@@ -27,8 +27,7 @@ type Member struct {
 	AvatarHash string `json:"avatarHash"`
 	Bio        string `json:"bio"`
 	BioData    struct {
-		Emoji struct {
-		} `json:"emoji"`
+		Emoji interface{} `json:"emoji,omitempty"`
 	} `json:"bioData"`
 	Confirmed                bool     `json:"confirmed"`
 	FullName                 string   `json:"fullName"`
