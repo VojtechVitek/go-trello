@@ -52,3 +52,16 @@ func (l *List) Cards() (cards []Card, err error) {
 	}
 	return
 }
+
+func (l *List) Actions() (actions []Action, err error) {
+	body, err := l.client.Get("/lists/" + l.Id + "/actions")
+	if err != nil {
+		return
+	}
+
+	err = json.Unmarshal(body, &actions)
+	for i := range actions {
+		actions[i].client = l.client
+	}
+	return
+}
