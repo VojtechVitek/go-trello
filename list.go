@@ -29,6 +29,17 @@ type List struct {
 	Pos     float32 `json:"pos"`
 }
 
+func (c *Client) List(listId string) (list *List, err error) {
+	body, err := c.Get("/lists/" + listId)
+	if err != nil {
+		return
+	}
+
+	err = json.Unmarshal(body, &list)
+	list.client = c
+	return
+}
+
 func (l *List) Cards() (cards []Card, err error) {
 	body, err := l.client.Get("/lists/" + l.Id + "/cards")
 	if err != nil {
