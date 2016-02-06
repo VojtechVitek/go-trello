@@ -66,6 +66,16 @@ func (c *Client) Post(resource string, data url.Values) ([]byte, error) {
 	return c.do(req)
 }
 
+func (c *Client) Put(resource string, data url.Values) ([]byte, error) {
+	req, err := http.NewRequest("PUT", c.endpoint+resource, strings.NewReader(data.Encode()))
+	if err != nil {
+		return nil, err
+	}
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+
+	return c.do(req)
+}
+
 func (c *Client) Delete(resource string) ([]byte, error) {
 	req, err := http.NewRequest("DELETE", c.endpoint+resource, nil)
 	if err != nil {
