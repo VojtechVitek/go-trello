@@ -188,3 +188,12 @@ func (c *Card) Archive() ([]byte, error) {
 
 	return c.client.Put("/cards/"+c.Id+"/closed", payload)
 }
+
+// MoveToList will move the card to another list
+// https://developers.trello.com/advanced-reference/card#put-1-cards-card-id-or-shortlink-idlist
+func (c *Card) MoveToList(listId string) ([]byte, error) {
+	payload := url.Values{}
+	payload.Set("value", listId)
+
+	return c.client.Put("/cards/"+c.Id+"/idList", payload)
+}
