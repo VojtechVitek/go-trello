@@ -16,10 +16,7 @@ limitations under the License.
 
 package trello
 
-import (
-	"encoding/json"
-	"fmt"
-)
+import "encoding/json"
 
 type Board struct {
 	client   *Client
