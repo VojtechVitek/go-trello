@@ -16,6 +16,8 @@ limitations under the License.
 
 package trello
 
+import "encoding/json"
+
 type Notification struct {
 	client *Client
 	Id     string `json:"id"`
@@ -62,7 +64,7 @@ func (c *Client) Notification(notificationId string) (notification *Notification
 		return
 	}
 
-	err = json.Unmarshal(body, &Notification)
+	err = json.Unmarshal(body, &notification)
 	notification.client = c
 	return
 }
