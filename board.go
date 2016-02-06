@@ -16,7 +16,10 @@ limitations under the License.
 
 package trello
 
-import "encoding/json"
+import (
+	"encoding/json"
+	"fmt"
+)
 
 type Board struct {
 	client   *Client
@@ -167,8 +170,13 @@ func (b *Board) MemberCards(IdMember string) (cards []Card, err error) {
 	return
 }
 
-func (b *Board) Actions() (actions []Action, err error) {
-	body, err := b.client.Get("/boards/" + b.Id + "/actions")
+func (b *Board) Actions(arg ...*Argument) (actions []Action, err error) {
+	ep := "/boards/" + b.Id + "/actions"
+	if query := EncodeArgs(arg); query != "" {
+		ep += "?" + query
+	}
+
+	body, err := b.client.Get(ep)
 	if err != nil {
 		return
 	}
