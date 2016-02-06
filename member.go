@@ -44,7 +44,7 @@ type Member struct {
 	IdBoards                 []string `json:"idBoards"`
 	IdBoardsPinned           []string `json:"idBoardsPinned"`
 	IdOrganizations          []string `json:"idOrganizations"`
-	LoginTypes               string   `json:"loginTypes"`
+	LoginTypes               []string `json:"loginTypes"`
 	NewEmail                 string   `json:"newEmail"`
 	OneTimeMessagesDismissed []string `json:"oneTimeMessagesDismissed"`
 	Prefs                    struct {
