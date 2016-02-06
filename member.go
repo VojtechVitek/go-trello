@@ -90,6 +90,19 @@ func (m *Member) Boards(field ...string) (boards []Board, err error) {
 	return
 }
 
+func (m *Member) Notifications() (notifications []Notification, err error) {
+	body, err := m.client.Get("/members/" + m.Id + "/notifications")
+	if err != nil {
+		return
+	}
+
+	err = json.Unmarshal(body, &notifications)
+	for i := range notifications {
+		notifications[i].client = m.client
+	}
+	return
+}
+
 // TODO: Avatar sizes [170, 30]
 func (m *Member) AvatarUrl() string {
 	return "https://trello-avatars.s3.amazonaws.com/" + m.AvatarHash + "/170.png"
