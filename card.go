@@ -179,3 +179,12 @@ func (c *Card) AddComment(text string) ([]byte, error) {
 	body, err := c.client.Post("/cards/"+c.Id+"/actions/comments", payload)
 	return body, err
 }
+
+// Archive will archive the card
+// https://developers.trello.com/advanced-reference/card#put-1-cards-card-id-or-shortlink-closed
+func (c *Card) Archive() ([]byte, error) {
+	payload := url.Values{}
+	payload.Set("value", "true")
+
+	return c.client.Put("/cards/"+c.Id+"/closed", payload)
+}
