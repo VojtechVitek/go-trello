@@ -197,3 +197,12 @@ func (c *Card) MoveToList(listId string) ([]byte, error) {
 
 	return c.client.Put("/cards/"+c.Id+"/idList", payload)
 }
+
+// MoveToPos will move card to the specified position
+// https://developers.trello.com/advanced-reference/card#put-1-cards-card-id-or-shortlink-pos
+func (c *Card) MoveToPos(pos string) ([]byte, error) {
+	payload := url.Values{}
+	payload.Set("value", pos)
+
+	return c.client.Put("/cards/"+c.Id+"/pos", payload)
+}
