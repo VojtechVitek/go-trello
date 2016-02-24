@@ -65,3 +65,9 @@ func (l *List) Actions() (actions []Action, err error) {
 	}
 	return
 }
+
+// AddCard is just a wrapper for Client.NewCard
+func (l *List) AddCard(card Card) (*Card, error) {
+	card.IdList = l.Id
+	return l.client.NewCard(card)
+}
