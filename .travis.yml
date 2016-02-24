@@ -7,7 +7,9 @@ go:
   - tip
 
 install:
-  - go build -race -v ./
+  - go get 'github.com/franela/goblin'
+  - go get 'github.com/onsi/gomega'
+  - go get 'github.com/VojtechVitek/go-trello'
 
 script:
   - go test ./tests/...
