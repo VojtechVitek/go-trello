@@ -18,6 +18,9 @@ package trello
 
 import (
 	"encoding/json"
+	"net/url"
+	"strconv"
+	"strings"
 )
 
 type List struct {
@@ -66,8 +69,28 @@ func (l *List) Actions() (actions []Action, err error) {
 	return
 }
 
-// AddCard is just a wrapper for Client.NewCard
-func (l *List) AddCard(card Card) (*Card, error) {
-	card.IdList = l.Id
-	return l.client.NewCard(card)
+// AddCard creates with the attributes of the supplied Card struct
+// https://developers.trello.com/advanced-reference/card#post-1-cards
+func (l *List) AddCard(opts Card) (*Card, error) {
+	opts.IdList = l.Id
+
+	payload := url.Values{}
+	payload.Set("name", opts.Name)
+	payload.Set("desc", opts.Desc)
+	payload.Set("pos", strconv.Itoa(opts.Pos))
+	payload.Set("due", opts.Due)
+	payload.Set("idList", opts.IdList)
+	payload.Set("idMembers", strings.Join(opts.IdMembers, ","))
+
+	body, err := l.client.Post("/cards", payload)
+	if err != nil {
+		return nil, err
+	}
+
+	var card Card
+	if err = json.Unmarshal(body, &card); err != nil {
+		return nil, err
+	}
+	card.client = l.client
+	return &card, nil
 }

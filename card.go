@@ -19,8 +19,6 @@ package trello
 import (
 	"encoding/json"
 	"net/url"
-	"strconv"
-	"strings"
 )
 
 type Card struct {
@@ -79,29 +77,6 @@ func (c *Client) Card(CardId string) (card *Card, err error) {
 	err = json.Unmarshal(body, &card)
 	card.client = c
 	return
-}
-
-// NewCard creates with the attributes of the supplied Card struct
-// https://developers.trello.com/advanced-reference/card#post-1-cards
-func (c *Client) NewCard(card Card) (_ *Card, err error) {
-	payload := url.Values{}
-	payload.Set("name", card.Name)
-	payload.Set("desc", card.Desc)
-	payload.Set("pos", strconv.Itoa(card.Pos))
-	payload.Set("due", card.Due)
-	payload.Set("idList", card.IdList)
-	payload.Set("idMembers", strings.Join(card.IdMembers, ","))
-
-	body, err := c.Post("/cards", payload)
-	if err != nil {
-		return nil, err
-	}
-
-	if err = json.Unmarshal(body, &card); err != nil {
-		return nil, err
-	}
-	card.client = c
-	return &card, nil
 }
 
 func (c *Card) Checklists() (checklists []Checklist, err error) {
