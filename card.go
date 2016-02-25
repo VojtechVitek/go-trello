@@ -262,39 +262,3 @@ func (c *Card) MoveToPos(pos int) (*Card, error) {
 	newCard.client = c.client
 	return newCard, nil
 }
-
-// Archive will archive the card
-// https://developers.trello.com/advanced-reference/card#put-1-cards-card-id-or-shortlink-closed
-func (c *Card) Archive() ([]byte, error) {
-	payload := url.Values{}
-	payload.Set("value", "true")
-
-	return c.client.Put("/cards/"+c.Id+"/closed", payload)
-}
-
-// SendToBoard will dearchive the card, or send the card to the board back from archive
-// https://developers.trello.com/advanced-reference/card#put-1-cards-card-id-or-shortlink-closed
-func (c *Card) SendToBoard() ([]byte, error) {
-	payload := url.Values{}
-	payload.Set("value", "false")
-
-	return c.client.Put("/cards/"+c.Id+"/closed", payload)
-}
-
-// MoveToList will move the card to another list
-// https://developers.trello.com/advanced-reference/card#put-1-cards-card-id-or-shortlink-idlist
-func (c *Card) MoveToList(list *List) ([]byte, error) {
-	payload := url.Values{}
-	payload.Set("value", list.Id)
-
-	return c.client.Put("/cards/"+c.Id+"/idList", payload)
-}
-
-// MoveToPos will move card to the specified position
-// https://developers.trello.com/advanced-reference/card#put-1-cards-card-id-or-shortlink-pos
-func (c *Card) MoveToPos(pos string) ([]byte, error) {
-	payload := url.Values{}
-	payload.Set("value", pos)
-
-	return c.client.Put("/cards/"+c.Id+"/pos", payload)
-}
