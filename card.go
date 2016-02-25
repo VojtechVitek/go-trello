@@ -204,6 +204,16 @@ func (c *Card) Actions() (actions []Action, err error) {
 	return
 }
 
+// Delete will delete the card forever
+// https://developers.trello.com/advanced-reference/card#delete-1-cards-card-id-or-shortlink
+func (c *Card) Delete() error {
+	_, err := c.client.Delete("/cards/" + c.Id)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 // AddChecklist will add a checklist to the card.
 // https://developers.trello.com/advanced-reference/card#post-1-cards-card-id-or-shortlink-checklists
 func (c *Card) AddChecklist(name string) (*Checklist, error) {
