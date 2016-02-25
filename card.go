@@ -172,12 +172,21 @@ func (c *Card) AddChecklist(name string) (*Checklist, error) {
 
 // AddComment will add a new comment to the card
 // https://developers.trello.com/advanced-reference/card#post-1-cards-card-id-or-shortlink-actions-comments
-func (c *Card) AddComment(text string) ([]byte, error) {
+func (c *Card) AddComment(text string) (*Action, error) {
+	newAction := &Action{}
+
 	payload := url.Values{}
 	payload.Set("text", text)
 
 	body, err := c.client.Post("/cards/"+c.Id+"/actions/comments", payload)
-	return body, err
+	if err != nil {
+		return nil, err
+	}
+	if err = json.Unmarshal(body, newAction); err != nil {
+		return nil, err
+	}
+	newAction.client = c.client
+	return newAction, nil
 }
 
 // Archive will archive the card

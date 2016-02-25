@@ -44,7 +44,7 @@ type Member struct {
 	IdBoards                 []string `json:"idBoards"`
 	IdBoardsPinned           []string `json:"idBoardsPinned"`
 	IdOrganizations          []string `json:"idOrganizations"`
-	LoginTypes               string   `json:"loginTypes"`
+	LoginTypes               []string `json:"loginTypes"`
 	NewEmail                 string   `json:"newEmail"`
 	OneTimeMessagesDismissed []string `json:"oneTimeMessagesDismissed"`
 	Prefs                    struct {
@@ -86,6 +86,19 @@ func (m *Member) Boards(field ...string) (boards []Board, err error) {
 	err = json.Unmarshal(body, &boards)
 	for i := range boards {
 		boards[i].client = m.client
+	}
+	return
+}
+
+func (m *Member) Notifications() (notifications []Notification, err error) {
+	body, err := m.client.Get("/members/" + m.Id + "/notifications")
+	if err != nil {
+		return
+	}
+
+	err = json.Unmarshal(body, &notifications)
+	for i := range notifications {
+		notifications[i].client = m.client
 	}
 	return
 }
