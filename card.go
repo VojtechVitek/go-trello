@@ -19,6 +19,7 @@ package trello
 import (
 	"encoding/json"
 	"net/url"
+	"strconv"
 )
 
 type Card struct {
@@ -172,10 +173,92 @@ func (c *Card) AddChecklist(name string) (*Checklist, error) {
 
 // AddComment will add a new comment to the card
 // https://developers.trello.com/advanced-reference/card#post-1-cards-card-id-or-shortlink-actions-comments
-func (c *Card) AddComment(text string) ([]byte, error) {
+func (c *Card) AddComment(text string) (*Action, error) {
 	payload := url.Values{}
 	payload.Set("text", text)
 
 	body, err := c.client.Post("/cards/"+c.Id+"/actions/comments", payload)
-	return body, err
+	if err != nil {
+		return nil, err
+	}
+
+	var newAction *Action
+	if err = json.Unmarshal(body, newAction); err != nil {
+		return nil, err
+	}
+	newAction.client = c.client
+	return newAction, nil
+}
+
+// Archive will archive the card
+// https://developers.trello.com/advanced-reference/card#put-1-cards-card-id-or-shortlink-closed
+func (c *Card) Archive() (*Card, error) {
+	payload := url.Values{}
+	payload.Set("value", "true")
+
+	body, err := c.client.Put("/cards/"+c.Id+"/closed", payload)
+	if err != nil {
+		return nil, err
+	}
+
+	var newCard *Card
+	if err = json.Unmarshal(body, newCard); err != nil {
+		return nil, err
+	}
+	newCard.client = c.client
+	return newCard, nil
+}
+
+// SendToBoard will dearchive the card, or send the card to the board back from archive
+// https://developers.trello.com/advanced-reference/card#put-1-cards-card-id-or-shortlink-closed
+func (c *Card) SendToBoard() (*Card, error) {
+	payload := url.Values{}
+	payload.Set("value", "false")
+
+	body, err := c.client.Put("/cards/"+c.Id+"/closed", payload)
+	if err != nil {
+		return nil, err
+	}
+	var newCard *Card
+	if err = json.Unmarshal(body, newCard); err != nil {
+		return nil, err
+	}
+	newCard.client = c.client
+	return newCard, nil
+}
+
+// MoveToList will move the card to another list
+// https://developers.trello.com/advanced-reference/card#put-1-cards-card-id-or-shortlink-idlist
+func (c *Card) MoveToList(listId string) (*Card, error) {
+	payload := url.Values{}
+	payload.Set("value", listId)
+
+	body, err := c.client.Put("/cards/"+c.Id+"/idList", payload)
+	if err != nil {
+		return nil, err
+	}
+	var newCard *Card
+	if err = json.Unmarshal(body, newCard); err != nil {
+		return nil, err
+	}
+	newCard.client = c.client
+	return newCard, nil
+}
+
+// MoveToPos will move card to the specified position
+// https://developers.trello.com/advanced-reference/card#put-1-cards-card-id-or-shortlink-pos
+func (c *Card) MoveToPos(pos int) (*Card, error) {
+	payload := url.Values{}
+	payload.Set("value", strconv.Itoa(pos))
+
+	body, err := c.client.Put("/cards/"+c.Id+"/pos", payload)
+	if err != nil {
+		return nil, err
+	}
+	var newCard *Card
+	if err = json.Unmarshal(body, newCard); err != nil {
+		return nil, err
+	}
+	newCard.client = c.client
+	return newCard, nil
 }
