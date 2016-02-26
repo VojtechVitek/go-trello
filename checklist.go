@@ -64,26 +64,26 @@ func (c *Checklist) Delete() error {
 //   name must have a length 1 <= length <= 16384
 //   pos can take the values 'top', 'bottom', or a positive integer
 // https://developers.trello.com/advanced-reference/checklist#post-1-checklists-idchecklist-checkitems
-func (c *Checklist) AddItem(name string, pos *string, checked *bool) (*ChecklistItem, error) {
+func (c *Checklist) AddItem(name string, pos string, checked bool) (*ChecklistItem, error) {
 	payload := url.Values{}
 	if len(name) < 1 || len(name) > 16384 {
 		return nil, fmt.Errorf("Checklist item name %q has invalid length. 1 <= length <= 16384", name)
 	}
 	payload.Set("name", name)
-	if pos != nil {
-		if *pos != "top" && *pos != "bottom" {
-			i, err := strconv.Atoi(*pos)
+	if pos != "" {
+		if pos != "top" && pos != "bottom" {
+			i, err := strconv.Atoi(pos)
 			if err != nil {
 				return nil, err
 			}
 			if i < 1 {
-				return nil, fmt.Errorf("Checklist item position %q is invalid. Only 'top', 'bottom', or a positive integer", *pos)
+				return nil, fmt.Errorf("Checklist item position %q is invalid. Only 'top', 'bottom', or a positive integer", pos)
 			}
 		}
-		payload.Set("pos", *pos)
+		payload.Set("pos", pos)
 	}
-	if checked != nil {
-		payload.Set("checked", strconv.FormatBool(*checked))
+	if checked {
+		payload.Set("checked", strconv.FormatBool(checked))
 	}
 	body, err := c.client.Post("/checklist/"+c.Id+"/checkItems", payload)
 	if err != nil {
