@@ -35,7 +35,7 @@ type Card struct {
 	IdMembersVoted        []string `json:"idMembersVoted"`
 	ManualCoverAttachment bool     `json:"manualCoverAttachment"`
 	Closed                bool     `json:"closed"`
-	Pos                   float32  `json:"pos"`
+	Pos                   int      `json:"pos"`
 	ShortLink             string   `json:"shortLink"`
 	DateLastActivity      string   `json:"dateLastActivity"`
 	ShortUrl              string   `json:"shortUrl"`
