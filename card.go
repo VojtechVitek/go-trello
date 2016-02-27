@@ -155,14 +155,14 @@ func (c *Card) Actions() (actions []Action, err error) {
 // AddChecklist will add a checklist to the card.
 // https://developers.trello.com/advanced-reference/card#post-1-cards-card-id-or-shortlink-checklists
 func (c *Card) AddChecklist(name string) (*Checklist, error) {
-	newList := &Checklist{}
-
 	payload := url.Values{}
 	payload.Set("name", name)
 	body, err := c.client.Post("/cards/"+c.Id+"/checklists", payload)
 	if err != nil {
 		return nil, err
 	}
+
+	newList := &Checklist{}
 	if err = json.Unmarshal(body, newList); err != nil {
 		return nil, err
 	}
@@ -182,7 +182,7 @@ func (c *Card) AddComment(text string) (*Action, error) {
 		return nil, err
 	}
 
-	var newAction *Action
+	newAction := &Action{}
 	if err = json.Unmarshal(body, newAction); err != nil {
 		return nil, err
 	}
@@ -201,7 +201,7 @@ func (c *Card) Archive() (*Card, error) {
 		return nil, err
 	}
 
-	var newCard *Card
+	newCard := &Card{}
 	if err = json.Unmarshal(body, newCard); err != nil {
 		return nil, err
 	}
@@ -219,7 +219,7 @@ func (c *Card) SendToBoard() (*Card, error) {
 	if err != nil {
 		return nil, err
 	}
-	var newCard *Card
+	newCard := &Card{}
 	if err = json.Unmarshal(body, newCard); err != nil {
 		return nil, err
 	}
@@ -237,7 +237,7 @@ func (c *Card) MoveToList(listId string) (*Card, error) {
 	if err != nil {
 		return nil, err
 	}
-	var newCard *Card
+	newCard := &Card{}
 	if err = json.Unmarshal(body, newCard); err != nil {
 		return nil, err
 	}
@@ -255,7 +255,7 @@ func (c *Card) MoveToPos(pos int) (*Card, error) {
 	if err != nil {
 		return nil, err
 	}
-	var newCard *Card
+	newCard := &Card{}
 	if err = json.Unmarshal(body, newCard); err != nil {
 		return nil, err
 	}
