@@ -69,6 +69,24 @@ func (l *List) Actions() (actions []Action, err error) {
 	return
 }
 
+func (l *List) Actions(arg ...*Argument) (actions []Action, err error) {
+	ep := "/lists/" + l.Id + "/actions"
+	if query := EncodeArgs(arg); query != "" {
+		ep += "?" + query
+	}
+
+	body, err := l.client.Get(ep)
+	if err != nil {
+		return
+	}
+
+	err = json.Unmarshal(body, &actions)
+	for i := range actions {
+		actions[i].client = l.client
+	}
+	return
+}
+
 // AddCard creates with the attributes of the supplied Card struct
 // https://developers.trello.com/advanced-reference/card#post-1-cards
 func (l *List) AddCard(opts Card) (*Card, error) {
