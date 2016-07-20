@@ -18,8 +18,8 @@ package trello
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/url"
-	"strconv"
 	"strings"
 )
 
@@ -56,8 +56,13 @@ func (l *List) Cards() (cards []Card, err error) {
 	return
 }
 
-func (l *List) Actions() (actions []Action, err error) {
-	body, err := l.client.Get("/lists/" + l.Id + "/actions")
+func (l *List) Actions(arg ...*Argument) (actions []Action, err error) {
+	ep := "/lists/" + l.Id + "/actions"
+	if query := EncodeArgs(arg); query != "" {
+		ep += "?" + query
+	}
+
+	body, err := l.client.Get(ep)
 	if err != nil {
 		return
 	}
@@ -77,7 +82,7 @@ func (l *List) AddCard(opts Card) (*Card, error) {
 	payload := url.Values{}
 	payload.Set("name", opts.Name)
 	payload.Set("desc", opts.Desc)
-	payload.Set("pos", strconv.Itoa(opts.Pos))
+	payload.Set("pos", fmt.Sprintf("%f", opts.Pos))
 	payload.Set("due", opts.Due)
 	payload.Set("idList", opts.IdList)
 	payload.Set("idMembers", strings.Join(opts.IdMembers, ","))
