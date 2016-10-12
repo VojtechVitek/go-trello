@@ -49,6 +49,13 @@ func (c *Client) Webhook(webhookID string) (webhook Webhook, err error) {
 	return
 }
 
+func (c *Client) DeleteWebhook(webhookID string) (err error) {
+
+	url := fmt.Sprintf("/webhooks/%s/", webhookID)
+	_, err = c.Delete(url)
+	return
+}
+
 func webhookURL(token string) (url string) {
 
 	return fmt.Sprintf("/tokens/%s/webhooks/", token)
