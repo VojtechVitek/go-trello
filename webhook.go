@@ -3,6 +3,7 @@ package trello
 import (
 	"encoding/json"
 	"fmt"
+	"net/url"
 )
 
 type Webhook struct {
@@ -20,6 +21,20 @@ func (c *Client) Webhooks(token string) (webhooks []Webhook, err error) {
 		return []Webhook{}, err
 	}
 	err = json.Unmarshal(body, &webhooks)
+	return
+}
+
+func (c *Client) CreateWebhook(hook Webhook) (webhook Webhook, err error) {
+
+	payload := url.Values{}
+	payload.Set("description", hook.Description)
+	payload.Set("callbackURL", hook.CallbackURL)
+	payload.Set("idModel", hook.IDModel)
+	body, err := c.Post("/webhooks/", payload)
+	if err != nil {
+		return Webhook{}, err
+	}
+	err = json.Unmarshal(body, &webhook)
 	return
 }
 
