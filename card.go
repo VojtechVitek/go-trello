@@ -17,8 +17,16 @@ limitations under the License.
 package trello
 
 import (
+	"bytes"
 	"encoding/json"
+	"io"
+	"mime"
+	"mime/multipart"
+	"net/http"
 	"net/url"
+	"os"
+	"path/filepath"
+	"strings"
 )
 
 type Card struct {
@@ -138,6 +146,51 @@ func (c *Card) Attachment(attachmentId string) (*Attachment, error) {
 	return attachment, err
 }
 
+// UploadAttachment will add a new attachment to a card
+// https://developers.trello.com/advanced-reference/card#post-1-cards-card-id-or-shortlink-attachments
+func (c *Card) UploadAttachment(path string) (*Attachment, error) {
+	file, err := os.Open(path)
+	if err != nil {
+		return nil, err
+	}
+	defer file.Close()
+
+	post := &bytes.Buffer{}
+	writer := multipart.NewWriter(post)
+	part, err := writer.CreateFormFile("file", filepath.Base(path))
+	if err != nil {
+		return nil, err
+	}
+
+	_, err = io.Copy(part, file)
+	if err != nil {
+		return nil, err
+	}
+
+	splitted := strings.Split(path, ".")
+	ext := splitted[len(splitted)-1]
+	writer.WriteField("mimeType", mime.TypeByExtension("."+ext))
+
+	err = writer.Close()
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("POST", c.client.endpoint+"/cards/"+c.Id+"/attachments", post)
+	if err != nil {
+		return nil, err
+	}
+	req.Header.Set("Content-Type", writer.FormDataContentType())
+	body, err := c.client.do(req)
+
+	newAttachment := &Attachment{}
+	if err = json.Unmarshal(body, newAttachment); err != nil {
+		return nil, err
+	}
+	newAttachment.client = c.client
+	return newAttachment, nil
+}
+
 func (c *Card) Actions() (actions []Action, err error) {
 	body, err := c.client.Get("/cards/" + c.Id + "/actions")
 	if err != nil {
@@ -149,6 +202,16 @@ func (c *Card) Actions() (actions []Action, err error) {
 		actions[i].client = c.client
 	}
 	return
+}
+
+// Delete will delete the card forever
+// https://developers.trello.com/advanced-reference/card#delete-1-cards-card-id-or-shortlink
+func (c *Card) Delete() error {
+	_, err := c.client.Delete("/cards/" + c.Id)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 // AddChecklist will add a checklist to the card.

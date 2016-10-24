@@ -48,21 +48,58 @@ func TestManyThings(t *testing.T) {
 			Expect(Board.Name).To(Equal("go-trello test board"))
 		})
 
+		var list trello.List
+
 		g.It("should list the lists", func() {
 			lists, err := Board.Lists()
+			list = lists[1]
 			Expect(err).To(BeNil())
 			Expect(lists[0].Name).To(Equal("meta"))
 			Expect(lists[1].Name).To(Equal("a list"))
 		})
 
-		g.It("should get a card using two different methods", func() {
-			card, err := Board.Card("56cdb3e0f7f4609c2b6f15e4")
+		g.It("should get a card using different methods", func() {
+			cards, err := list.Cards()
+			Expect(err).To(BeNil())
+
+			card, err := Board.Card(cards[0].Id)
 			Expect(err).To(BeNil())
 			Expect(card.Name).To(Equal("a card"))
-			sameCard, err := Client.Card("8sB7wile")
+
+			sameCard, err := Client.Card(cards[0].ShortLink)
 			Expect(err).To(BeNil())
 			Expect(sameCard.Name).To(Equal("a card"))
 			Expect(sameCard.Desc).To(Equal(card.Desc))
+		})
+
+		g.It("should create a card", func() {
+			card, err := list.AddCard(trello.Card{
+				Name: "card created during test",
+				Desc: "blank description.",
+				Pos:  999,
+			})
+			Expect(err).To(BeNil())
+			Expect(card.Name).To(Equal("card created during test"))
+			Expect(card.Desc).To(Equal("blank description."))
+		})
+
+		var card trello.Card
+
+		g.It("should upload an attachment to the second card", func() {
+			cards, _ := list.Cards()
+			Expect(cards).To(HaveLen(2))
+			card = cards[1]
+			attach, err := card.UploadAttachment("attachment.txt")
+			Expect(err).To(BeNil())
+			Expect(attach.Name).To(Equal("attachment.txt"))
+			Expect(attach.Url).To(HavePrefix("https://trello-attachments.s3.amazonaws.com/"))
+			// trello doesn't return this correcty, so let's not test it
+			// Expect(attach.MimeType).To(Equal("text/plain"))
+		})
+
+		g.It("should delete the card", func() {
+			err := card.Delete()
+			Expect(err).To(BeNil())
 		})
 	})
 
