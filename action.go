@@ -57,6 +57,13 @@ type Action struct {
 			ShortLink string `json:"shortLink"`
 			IdShort   int    `json:"idShort"`
 		} `json:"card"`
+		Action struct {
+			Id   string `json:"id"`
+			Text string `json:"text"`
+		} `json:"action"`
+		Old struct {
+			Text string `json:"text"`
+		}
 		Text string `json:"text"`
 	} `json:"data"`
 	Type          string `json:"type"`
