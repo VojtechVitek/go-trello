@@ -38,7 +38,7 @@ func TestManyThings(t *testing.T) {
 		g.It("should create a client", func() {
 			key := os.Getenv("API_KEY")
 			token := os.Getenv("API_TOKEN")
-			Client, err = trello.NewAuthClient(key, &token)
+			Client, err = trello.NewAuthClient(key, token)
 			Expect(err).To(BeNil())
 		})
 
