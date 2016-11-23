@@ -59,8 +59,15 @@ type Action struct {
 		} `json:"card"`
 		Text string `json:"text"`
 	} `json:"data"`
-	Type          string `json:"type"`
-	Date          string `json:"date"`
+	Type   string `json:"type"`
+	Date   string `json:"date"`
+	Member struct {
+		Id         string `json:"id"`
+		AvatarHash string `json:"avatarHash"`
+		FullName   string `json:"fullName"`
+		Initials   string `json:"initials"`
+		Username   string `json:"username"`
+	} `json:"member"`
 	MemberCreator struct {
 		Id         string `json:"id"`
 		AvatarHash string `json:"avatarHash"`
