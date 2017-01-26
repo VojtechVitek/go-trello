@@ -70,6 +70,17 @@ func (c *Client) Member(nick string) (member *Member, err error) {
 	return
 }
 
+func (c *Client) MemberFromToken(token string) (member *Member, err error) {
+	body, err := c.Get("/tokens/" + token + "/member")
+	if err != nil {
+		return
+	}
+
+	err = json.Unmarshal(body, &member)
+	member.client = c
+	return
+}
+
 func (m *Member) Boards(field ...string) (boards []Board, err error) {
 	fields := ""
 	if len(field) == 0 {
