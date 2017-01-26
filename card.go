@@ -188,3 +188,41 @@ func (c *Card) AddComment(text string) (*Action, error) {
 	newAction.client = c.client
 	return newAction, nil
 }
+
+// ChangeList move the card to another list
+// https://developers.trello.com/advanced-reference/card#put-1-cards-card-id-or-shortlink-idlist
+func (c *Card) ChangeList(listId string) (*Action, error) {
+	newAction := &Action{}
+
+	payload := url.Values{}
+	payload.Set("value", listId)
+
+	body, err := c.client.Put("/cards/"+c.Id+"/idList", payload)
+	if err != nil {
+		return nil, err
+	}
+	if err = json.Unmarshal(body, newAction); err != nil {
+		return nil, err
+	}
+	newAction.client = c.client
+	return newAction, nil
+}
+
+// SetDesc will set the card's description
+// https://developers.trello.com/advanced-reference/card#put-1-cards-card-id-or-shortlink-desc
+func (c *Card) SetDesc(desc string) (*Action, error) {
+	newAction := &Action{}
+
+	payload := url.Values{}
+	payload.Set("value", desc)
+
+	body, err := c.client.Put("/cards/"+c.Id+"/desc", payload)
+	if err != nil {
+		return nil, err
+	}
+	if err = json.Unmarshal(body, newAction); err != nil {
+		return nil, err
+	}
+	newAction.client = c.client
+	return newAction, nil
+}
