@@ -16,7 +16,11 @@ limitations under the License.
 
 package trello
 
-import "encoding/json"
+import (
+	"encoding/json"
+	"net/url"
+	"strconv"
+)
 
 type Board struct {
 	client   *Client
@@ -183,4 +187,26 @@ func (b *Board) Actions(arg ...*Argument) (actions []Action, err error) {
 		actions[i].client = b.client
 	}
 	return
+}
+
+func (b *Board) AddList(opts List) (*List, error) {
+	opts.IdBoard = b.Id
+
+	payload := url.Values{}
+	payload.Set("name", opts.Name)
+	payload.Set("idBoard", opts.IdBoard)
+	payload.Set("pos", strconv.FormatFloat(float64(opts.Pos), 'g', -1, 32))
+
+	body, err := b.client.Post("/lists", payload)
+	if err != nil {
+		return nil, err
+	}
+
+	var list List
+	if err = json.Unmarshal(body, &list); err != nil {
+		return nil, err
+	}
+
+	list.client = b.client
+	return &list, nil
 }
