@@ -44,25 +44,25 @@ type Card struct {
 	Due                   string   `json:"due"`
 	Desc                  string   `json:"desc"`
 	DescData              struct {
-		Emoji struct{} `json:"emoji"`
-	} `json:"descData"`
-	CheckItemStates []struct {
+							  Emoji struct{} `json:"emoji"`
+						  } `json:"descData"`
+	CheckItemStates       []struct {
 		IdCheckItem string `json:"idCheckItem"`
 		State       string `json:"state"`
 	} `json:"checkItemStates"`
-	Badges struct {
-		Votes              int    `json:"votes"`
-		ViewingMemberVoted bool   `json:"viewingMemberVoted"`
-		Subscribed         bool   `json:"subscribed"`
-		Fogbugz            string `json:"fogbugz"`
-		CheckItems         int    `json:"checkItems"`
-		CheckItemsChecked  int    `json:"checkItemsChecked"`
-		Comments           int    `json:"comments"`
-		Attachments        int    `json:"attachments"`
-		Description        bool   `json:"description"`
-		Due                string `json:"due"`
-	} `json:"badges"`
-	Labels []struct {
+	Badges                struct {
+							  Votes              int    `json:"votes"`
+							  ViewingMemberVoted bool   `json:"viewingMemberVoted"`
+							  Subscribed         bool   `json:"subscribed"`
+							  Fogbugz            string `json:"fogbugz"`
+							  CheckItems         int    `json:"checkItems"`
+							  CheckItemsChecked  int    `json:"checkItemsChecked"`
+							  Comments           int    `json:"comments"`
+							  Attachments        int    `json:"attachments"`
+							  Description        bool   `json:"description"`
+							  Due                string `json:"due"`
+						  } `json:"badges"`
+	Labels                []struct {
 		Color string `json:"color"`
 		Name  string `json:"name"`
 	} `json:"labels"`
@@ -158,7 +158,7 @@ func (c *Card) AddChecklist(name string) (*Checklist, error) {
 
 	payload := url.Values{}
 	payload.Set("name", name)
-	body, err := c.client.Post("/cards/"+c.Id+"/checklists", payload)
+	body, err := c.client.Post("/cards/" + c.Id + "/checklists", payload)
 	if err != nil {
 		return nil, err
 	}
@@ -178,7 +178,7 @@ func (c *Card) AddComment(text string) (*Action, error) {
 	payload := url.Values{}
 	payload.Set("text", text)
 
-	body, err := c.client.Post("/cards/"+c.Id+"/actions/comments", payload)
+	body, err := c.client.Post("/cards/" + c.Id + "/actions/comments", payload)
 	if err != nil {
 		return nil, err
 	}
@@ -187,4 +187,22 @@ func (c *Card) AddComment(text string) (*Action, error) {
 	}
 	newAction.client = c.client
 	return newAction, nil
+}
+
+func (c *Card) Move(dstList List) (*Card, error) {
+
+	payload := url.Values{}
+	payload.Set("value", dstList.Id)
+
+	body, err := c.client.Put("/cards/" + c.Id + "/idList", payload)
+	if err != nil {
+		return nil, err
+	}
+
+	var card Card
+	if err = json.Unmarshal(body, &card); err != nil {
+		return nil, err
+	}
+	card.client = c.client
+	return &card, nil
 }
