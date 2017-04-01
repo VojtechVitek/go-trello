@@ -19,6 +19,7 @@ package trello
 import (
 	"encoding/json"
 	"net/url"
+	"strconv"
 )
 
 type Card struct {
@@ -190,7 +191,6 @@ func (c *Card) AddComment(text string) (*Action, error) {
 }
 
 func (c *Card) Move(dstList List) (*Card, error) {
-
 	payload := url.Values{}
 	payload.Set("value", dstList.Id)
 
@@ -205,4 +205,18 @@ func (c *Card) Move(dstList List) (*Card, error) {
 	}
 	card.client = c.client
 	return &card, nil
+}
+
+func (c *Card) Delete() error {
+	_, err := c.client.Delete("/cards/" + c.Id)
+	return err
+}
+
+//If mode is true, card is archived, otherwise it's unarchived (returns to the board)
+func (c *Card) Archive(mode bool) error {
+	payload := url.Values{}
+	payload.Set("value", strconv.FormatBool(mode))
+
+	_, err := c.client.Put("/cards/" + c.Id + "/closed", payload)
+	return err
 }
