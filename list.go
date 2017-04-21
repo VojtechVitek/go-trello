@@ -94,3 +94,12 @@ func (l *List) AddCard(opts Card) (*Card, error) {
 	card.client = l.client
 	return &card, nil
 }
+
+//If mode is true, list is archived, otherwise it's unarchived (returns to the board)
+func (l *List) Archive(mode bool) error {
+	payload := url.Values{}
+	payload.Set("value", strconv.FormatBool(mode))
+
+	_, err := l.client.Put("/lists/" + l.Id + "/closed", payload)
+	return err
+}
