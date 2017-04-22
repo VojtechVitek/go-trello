@@ -18,8 +18,8 @@ package trello
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/url"
-	"strconv"
 	"strings"
 )
 
@@ -56,8 +56,13 @@ func (l *List) Cards() (cards []Card, err error) {
 	return
 }
 
-func (l *List) Actions() (actions []Action, err error) {
-	body, err := l.client.Get("/lists/" + l.Id + "/actions")
+func (l *List) Actions(arg ...*Argument) (actions []Action, err error) {
+	ep := "/lists/" + l.Id + "/actions"
+	if query := EncodeArgs(arg); query != "" {
+		ep += "?" + query
+	}
+
+	body, err := l.client.Get(ep)
 	if err != nil {
 		return
 	}
