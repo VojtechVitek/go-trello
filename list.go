@@ -100,6 +100,24 @@ func (l *List) Archive(mode bool) error {
 	payload := url.Values{}
 	payload.Set("value", strconv.FormatBool(mode))
 
-	_, err := l.client.Put("/lists/" + l.Id + "/closed", payload)
+	_, err := l.client.Put("/lists/"+l.Id+"/closed", payload)
 	return err
+}
+
+//pos can be "bottom", "top" or a positive number
+func (l *List) Move(pos string) (*List, error) {
+	payload := url.Values{}
+	payload.Set("value", pos)
+
+	body, err := l.client.Put("/lists/"+l.Id+"/pos", payload)
+	if err != nil {
+		return nil, err
+	}
+
+	var list List
+	if err = json.Unmarshal(body, &list); err != nil {
+		return nil, err
+	}
+	list.client = l.client
+	return &list, nil
 }
