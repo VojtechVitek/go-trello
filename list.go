@@ -30,6 +30,7 @@ type List struct {
 	Closed  bool    `json:"closed"`
 	IdBoard string  `json:"idBoard"`
 	Pos     float32 `json:"pos"`
+	cards   []Card
 }
 
 func (c *Client) List(listId string) (list *List, err error) {
@@ -44,6 +45,9 @@ func (c *Client) List(listId string) (list *List, err error) {
 }
 
 func (l *List) Cards() (cards []Card, err error) {
+	if cards != nil {
+		return cards, nil
+	}
 	body, err := l.client.Get("/lists/" + l.Id + "/cards")
 	if err != nil {
 		return
@@ -53,7 +57,13 @@ func (l *List) Cards() (cards []Card, err error) {
 	for i := range cards {
 		cards[i].client = l.client
 	}
+	l.cards = cards
 	return
+}
+
+func (l *List) FreshCards() (cards []Card, err error) {
+	cards = nil
+	return l.Cards()
 }
 
 func (l *List) Actions() (actions []Action, err error) {
