@@ -45,8 +45,8 @@ func (c *Client) List(listId string) (list *List, err error) {
 }
 
 func (l *List) Cards() (cards []Card, err error) {
-	if cards != nil {
-		return cards, nil
+	if l.cards != nil {
+		return l.cards, nil
 	}
 	body, err := l.client.Get("/lists/" + l.Id + "/cards")
 	if err != nil {
@@ -62,7 +62,7 @@ func (l *List) Cards() (cards []Card, err error) {
 }
 
 func (l *List) FreshCards() (cards []Card, err error) {
-	cards = nil
+	l.cards = nil
 	return l.Cards()
 }
 
