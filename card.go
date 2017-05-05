@@ -238,3 +238,37 @@ func (c *Card) Archive(mode bool) error {
 	_, err := c.client.Put("/cards/"+c.Id+"/closed", payload)
 	return err
 }
+
+func (c *Card) SetName(name string) (*Card, error) {
+	payload := url.Values{}
+	payload.Set("value", name)
+
+	body, err := c.client.Put("/cards/"+c.Id+"/name", payload)
+	if err != nil {
+		return nil, err
+	}
+
+	var card Card
+	if err = json.Unmarshal(body, &card); err != nil {
+		return nil, err
+	}
+	card.client = c.client
+	return &card, nil
+}
+
+func (c *Card) SetDescription(desc string) (*Card, error) {
+	payload := url.Values{}
+	payload.Set("value", desc)
+
+	body, err := c.client.Put("/cards/"+c.Id+"/desc", payload)
+	if err != nil {
+		return nil, err
+	}
+
+	var card Card
+	if err = json.Unmarshal(body, &card); err != nil {
+		return nil, err
+	}
+	card.client = c.client
+	return &card, nil
+}
