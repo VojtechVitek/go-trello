@@ -20,7 +20,6 @@ import (
 	"encoding/json"
 	"net/url"
 	"strconv"
-	"log"
 )
 
 type Board struct {
@@ -225,7 +224,7 @@ func (b *Board) Labels() ([]Label, error) {
 	return labels, nil
 }
 
-//Color can be null
+//Color can be an empty string
 func (b *Board) AddLabel(name, color string) (*Label, error) {
 	payload := url.Values{}
 	payload.Set("name", name)
