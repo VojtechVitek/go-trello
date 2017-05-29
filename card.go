@@ -63,10 +63,7 @@ type Card struct {
 		Description        bool   `json:"description"`
 		Due                string `json:"due"`
 	} `json:"badges"`
-	Labels []struct {
-		Color string `json:"color"`
-		Name  string `json:"name"`
-	} `json:"labels"`
+	Labels []Label `json:"labels"`
 }
 
 func (c *Client) Card(CardId string) (card *Card, err error) {

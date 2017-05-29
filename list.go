@@ -56,6 +56,9 @@ func (l *List) Cards() (cards []Card, err error) {
 	err = json.Unmarshal(body, &cards)
 	for i := range cards {
 		cards[i].client = l.client
+		for j := range cards[i].Labels {
+			cards[i].Labels[j].client = l.client
+		}
 	}
 	l.cards = cards
 	return

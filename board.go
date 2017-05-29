@@ -20,6 +20,7 @@ import (
 	"encoding/json"
 	"net/url"
 	"strconv"
+	"log"
 )
 
 type Board struct {
@@ -209,4 +210,37 @@ func (b *Board) AddList(opts List) (*List, error) {
 
 	list.client = b.client
 	return &list, nil
+}
+
+func (b *Board) Labels() ([]Label, error) {
+	body, err := b.client.Get("/boards/" + b.Id + "/labels")
+	if err != nil {
+		return nil, err
+	}
+
+	var labels []Label
+	if err = json.Unmarshal(body, &labels); err != nil {
+		return nil, err
+	}
+	return labels, nil
+}
+
+//Color can be null
+func (b *Board) AddLabel(name, color string) (*Label, error) {
+	payload := url.Values{}
+	payload.Set("name", name)
+	payload.Set("color", color)
+
+	body, err := b.client.Post("/boards/" + b.Id + "/labels", payload)
+	if err != nil {
+		return nil, err
+	}
+
+	var label Label
+	if err = json.Unmarshal(body, &label); err != nil {
+		return nil, err
+	}
+
+	label.client = b.client
+	return &label, nil
 }
