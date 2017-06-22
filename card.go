@@ -270,7 +270,8 @@ func (c *Card) SetDescription(desc string) (*Card, error) {
 	return &card, nil
 }
 
-func (c *Card) AddLabel(id string) (*Label, error) {
+//Returns an array of cards labels ids
+func (c *Card) AddLabel(id string) ([]string, error) {
 	payload := url.Values{}
 	payload.Set("value", id)
 
@@ -279,13 +280,12 @@ func (c *Card) AddLabel(id string) (*Label, error) {
 		return nil, err
 	}
 
-	var label Label
-	if err = json.Unmarshal(body, &label); err != nil {
+	var ids []string
+	if err = json.Unmarshal(body, &ids); err != nil {
 		return nil, err
 	}
 
-	label.client = c.client
-	return &label, nil
+	return ids, nil
 }
 
 func (c *Card) AddNewLabel(name, color string) (*Label, error) {
