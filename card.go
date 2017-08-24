@@ -109,6 +109,27 @@ func (c *Card) Members() (members []Member, err error) {
 	return
 }
 
+// Remove a member from a card
+// The RemoveMember function requires a member (pointer) to delete
+// It returns the resulting member-list
+func (c *Card) RemoveMember(member *Member) (members []Member, err error) {
+	body, err := c.client.Delete("/cards/" + c.Id + "/idMembers/" + member.Id)
+	if err != nil {
+		return nil, err
+	}
+
+	err = json.Unmarshal(body, &members)
+	if err != nil {
+		return nil, err
+	}
+
+	// To enable our members to execute operations using our client, we need to pass each our client object
+	for i := range members {
+		members[i].client = c.client
+	}
+	return members, nil
+}
+
 func (c *Card) Attachments() (attachments []Attachment, err error) {
 	body, err := c.client.Get("/cards/" + c.Id + "/attachments")
 	if err != nil {
