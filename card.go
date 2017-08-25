@@ -44,7 +44,7 @@ type Card struct {
 	Url                   string   `json:"url"`
 	Due                   string   `json:"due"`
 	Desc                  string   `json:"desc"`
-	DescData struct {
+	DescData              struct {
 		Emoji struct{} `json:"emoji"`
 	} `json:"descData"`
 	CheckItemStates []struct {
@@ -107,6 +107,49 @@ func (c *Card) Members() (members []Member, err error) {
 		members[i].client = c.client
 	}
 	return
+}
+
+// Add a member to a card
+// The AddMember function requires a member (pointer) to add
+// It returns the resulting member-list
+// https://developers.trello.com/v1.0/reference#cardsididmembers
+func (c *Card) AddMember(member *Member) (members []Member, err error) {
+	payload := url.Values{}
+	payload.Set("value", member.Id)
+	body, err := c.client.Post("/cards/"+c.Id+"/idMembers", payload)
+	if err != nil {
+		return nil, err
+	}
+	if err = json.Unmarshal(body, &members); err != nil {
+		return nil, err
+	}
+
+	// To enable our members to execute operations using our client, we need to pass each our client object
+	for i := range members {
+		members[i].client = c.client
+	}
+	return members, nil
+}
+
+// Remove a member from a card
+// The RemoveMember function requires a member (pointer) to delete
+// It returns the resulting member-list
+func (c *Card) RemoveMember(member *Member) (members []Member, err error) {
+	body, err := c.client.Delete("/cards/" + c.Id + "/idMembers/" + member.Id)
+	if err != nil {
+		return nil, err
+	}
+
+	err = json.Unmarshal(body, &members)
+	if err != nil {
+		return nil, err
+	}
+
+	// To enable our members to execute operations using our client, we need to pass each our client object
+	for i := range members {
+		members[i].client = c.client
+	}
+	return members, nil
 }
 
 func (c *Card) Attachments() (attachments []Attachment, err error) {
