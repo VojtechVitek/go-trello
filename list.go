@@ -30,6 +30,7 @@ type List struct {
 	Closed  bool    `json:"closed"`
 	IdBoard string  `json:"idBoard"`
 	Pos     float32 `json:"pos"`
+	cards   []Card
 }
 
 func (c *Client) List(listId string) (list *List, err error) {
@@ -44,6 +45,9 @@ func (c *Client) List(listId string) (list *List, err error) {
 }
 
 func (l *List) Cards() (cards []Card, err error) {
+	if l.cards != nil {
+		return l.cards, nil
+	}
 	body, err := l.client.Get("/lists/" + l.Id + "/cards")
 	if err != nil {
 		return
@@ -52,8 +56,17 @@ func (l *List) Cards() (cards []Card, err error) {
 	err = json.Unmarshal(body, &cards)
 	for i := range cards {
 		cards[i].client = l.client
+		for j := range cards[i].Labels {
+			cards[i].Labels[j].client = l.client
+		}
 	}
+	l.cards = cards
 	return
+}
+
+func (l *List) FreshCards() (cards []Card, err error) {
+	l.cards = nil
+	return l.Cards()
 }
 
 func (l *List) Actions() (actions []Action, err error) {
@@ -93,4 +106,31 @@ func (l *List) AddCard(opts Card) (*Card, error) {
 	}
 	card.client = l.client
 	return &card, nil
+}
+
+//If mode is true, list is archived, otherwise it's unarchived (returns to the board)
+func (l *List) Archive(mode bool) error {
+	payload := url.Values{}
+	payload.Set("value", strconv.FormatBool(mode))
+
+	_, err := l.client.Put("/lists/"+l.Id+"/closed", payload)
+	return err
+}
+
+//pos can be "bottom", "top" or a positive number
+func (l *List) Move(pos string) (*List, error) {
+	payload := url.Values{}
+	payload.Set("value", pos)
+
+	body, err := l.client.Put("/lists/"+l.Id+"/pos", payload)
+	if err != nil {
+		return nil, err
+	}
+
+	var list List
+	if err = json.Unmarshal(body, &list); err != nil {
+		return nil, err
+	}
+	list.client = l.client
+	return &list, nil
 }
