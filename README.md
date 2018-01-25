@@ -18,7 +18,7 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/VojtechVitek/go-trello"
+	trello "github.com/VojtechVitek/go-trello"
 )
 
 func main() {
