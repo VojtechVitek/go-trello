@@ -68,7 +68,7 @@ type BoardBackground struct {
 }
 
 func (c *Client) Boards() (boards []Board, err error) {
-	body, err := c.Get("/boards/")
+	body, err := c.Get("/members/me/boards/")
 	if err != nil {
 		return
 	}
