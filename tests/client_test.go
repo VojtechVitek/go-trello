@@ -17,10 +17,9 @@ limitations under the License.
 package tests
 
 import (
-	"os"
 	"testing"
 
-	"github.com/VojtechVitek/go-trello"
+	trello "github.com/intello-io/go-trello"
 
 	. "github.com/franela/goblin"
 	. "github.com/onsi/gomega"
@@ -36,8 +35,8 @@ func TestManyThings(t *testing.T) {
 
 	g.Describe("many things", func() {
 		g.It("should create a client", func() {
-			key := os.Getenv("API_KEY")
-			token := os.Getenv("API_TOKEN")
+			key := "13fa64ff053aa4c44d559be42cce0cf4"
+			token := "f48f3511dda009c18df8ac7011054f0da02ca46bd08574a079d8ac571a5c4d74"
 			Client, err = trello.NewAuthClient(key, &token)
 			Expect(err).To(BeNil())
 		})
@@ -53,6 +52,13 @@ func TestManyThings(t *testing.T) {
 			Expect(err).To(BeNil())
 			Expect(lists[0].Name).To(Equal("meta"))
 			Expect(lists[1].Name).To(Equal("a list"))
+		})
+
+		g.It("should list the tokenID and memberID", func() {
+			tok, err := Client.GetTokenInfo("f48f3511dda009c18df8ac7011054f0da02ca46bd08574a079d8ac571a5c4d74")
+			Expect(err).To(BeNil())
+			Expect(tok.ID).To(Equal("5b6c87d32ddf724e9a570469"))
+			Expect(tok.MemberID).To(Equal("5b1943c73c45c04733236fb3"))
 		})
 
 		g.It("should get a card using two different methods", func() {
