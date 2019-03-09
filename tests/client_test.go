@@ -20,7 +20,7 @@ import (
 	"os"
 	"testing"
 
-	"github.com/VojtechVitek/go-trello"
+	"github.com/profects/go-trello"
 
 	. "github.com/franela/goblin"
 	. "github.com/onsi/gomega"

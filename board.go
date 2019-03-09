@@ -184,3 +184,13 @@ func (b *Board) Actions(arg ...*Argument) (actions []Action, err error) {
 	}
 	return
 }
+
+func (b *Board) Plugins() (plugins []Plugin, err error) {
+	body, err := b.client.Get("/boards/" + b.Id + "/boardPlugins")
+	if err != nil {
+		return
+	}
+
+	err = json.Unmarshal(body, &plugins)
+	return
+}

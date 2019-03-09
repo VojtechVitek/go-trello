@@ -5,8 +5,8 @@ go-trello is a [Go](http://golang.org/) client package for accessing the [Trello
 <a href="http://golang.org"><img alt="Go package" src="https://golang.org/doc/gopher/pencil/gopherhat.jpg" width="20%" /></a>
 <a href="http://trello.com"><img src="https://d2k1ftgv7pobq7.cloudfront.net/meta/p/res/images/c13d1cd96a2cff30f0460a5e1860c5ea/header-logo-blue.svg" style="height: 80px; margin-bottom: 2em;"></a>
 
-[![GoDoc](https://godoc.org/github.com/VojtechVitek/go-trello?status.png)](https://godoc.org/github.com/VojtechVitek/go-trello)
-[![Travis](https://travis-ci.org/VojtechVitek/go-trello.svg?branch=master)](https://travis-ci.org/VojtechVitek/go-trello)
+[![GoDoc](https://godoc.org/github.com/profects/go-trello?status.png)](https://godoc.org/github.com/profects/go-trello)
+[![Travis](https://travis-ci.org/profects/go-trello.svg?branch=master)](https://travis-ci.org/profects/go-trello)
 
 Example
 -------
@@ -18,7 +18,7 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/VojtechVitek/go-trello"
+	"github.com/profects/go-trello"
 )
 
 func main() {
