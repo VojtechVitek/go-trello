@@ -111,7 +111,7 @@ func (c *Card) Members() (members []Member, err error) {
 	return
 }
 
-func (c *Card) PluginData() (pluginData []map[string]interface{}, err error) {
+func (c *Card) PluginData() (pluginData PluginData, err error) {
 	body, err := c.client.Get("/cards/" + c.Id + "/pluginData")
 	if err != nil {
 		return
